@@ -139,6 +139,11 @@ class DetailActivity : AppCompatActivity(), DetailView {
     presenter.getEventDetailById(eventId)
   }
 
+  override fun onDestroy() {
+    presenter.dispose()
+    super.onDestroy()
+  }
+
   override fun showLoading() {
     scrollView.invisible()
     textViewErrorMessage.invisible()

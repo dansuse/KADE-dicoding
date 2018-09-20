@@ -14,9 +14,6 @@ class DetailPresenter (
     private val view: DetailView,
     private val theSportDBApiService: TheSportDBApiService){
 
-//  val theSportDBApiService by lazy {
-//    TheSportDBApiService.create()
-//  }
   var disposable: Disposable?=null
 
   fun getEventDetailById(eventId:String){

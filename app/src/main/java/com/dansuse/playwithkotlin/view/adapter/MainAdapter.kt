@@ -111,7 +111,6 @@ class MatchUI:AnkoComponent<ViewGroup>{
               width = wrapContent,
               weight = 1.0f
           )
-          //.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
           teamUI(R.id.team_badge_away, R.id.team_name_away, R.id.away_badge_progress_bar)
         }
       }
@@ -150,27 +149,5 @@ class MatchUI:AnkoComponent<ViewGroup>{
           width = matchParent, height = wrapContent
       )
     }
-        //.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
   }
 }
-
-//class TeamUI(private var idImageView:Int, private val idTextView:Int):AnkoComponent<ViewGroup>{
-//  override fun createView(ui: AnkoContext<ViewGroup>): View {
-//    return with(ui){
-//      linearLayout{
-//        orientation = LinearLayout.VERTICAL
-//        lparams(width = wrapContent, height = matchParent)
-//        imageView {
-//          id = idImageView
-//        }.lparams(
-//            width = dip(50), height = dip(50)
-//        )
-//        textView{
-//          id = idTextView
-//          textSize = 16f
-//          gravity = Gravity.CENTER
-//        }
-//      }
-//    }
-//  }
-//}

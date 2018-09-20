@@ -1,8 +1,6 @@
 package com.dansuse.playwithkotlin.presenter
 
-import android.util.Log
 import com.dansuse.playwithkotlin.model.Event
-import com.dansuse.playwithkotlin.model.EventResponse
 import com.dansuse.playwithkotlin.model.TeamResponse
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
 import com.dansuse.playwithkotlin.view.MainView
@@ -17,13 +15,6 @@ class MainPresenter (
     private val theSportDBApiService: TheSportDBApiService){
 
   fun getLeagueList(){
-//    doAsync {
-//      val data = gson.fromJson(apiRepository.doRequest(TheSportDBApi.getAllLeagues()),
-//          LeagueResponse::class.java)
-//      uiThread {
-//        view.showLeagueList(data.leagues)
-//      }
-//    }
     leagueDisposable = theSportDBApiService.getAllLeagues()
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
@@ -31,30 +22,14 @@ class MainPresenter (
           leagueResponse -> view.hideLoading()
           view.showLeagueList(leagueResponse.leagues)
         },
-        {error -> Log.d("tes123", "terjadi error")
+        {error ->
           view.showErrorMessage(error.message ?: "Terjadi kesalahan saat mencoba mengambil data")}
         )
   }
-//  fun getNext15EventsByLeagueId(leagueId:String){
-//    view.showLoading()
-//    doAsync {
-//      val data = gson.fromJson(apiRepository.doRequest(TheSportDBApi.getNext15EventsByLeagueId(leagueId)),
-//          EventResponse::class.java)
-//
-//      uiThread {
-//        view.hideLoading()
-//        view.showEventList(data.events)
-//      }
-//    }
-//  }
 
-//  val theSportDBApiService by lazy {
-//    TheSportDBApiService.create()
-//  }
   var eventDisposable: Disposable?=null
   var leagueDisposable: Disposable?=null
 
-  lateinit var cacheEventResponse:EventResponse
   fun get15EventsByLeagueId(leagueId:String, isPrevMatchMode:Boolean){
     if(leagueId != ""){
       view.showLoading()
@@ -62,19 +37,14 @@ class MainPresenter (
           if(isPrevMatchMode) TheSportDBApiService.MODE_PAST_15_EVENTS
           else TheSportDBApiService.MODE_NEXT_15_EVENTS,
           leagueId.toInt())
-          .doOnError{
-            error -> Log.d("tes123", "error bro")
-          }
-          .map{ eventResponse -> cacheEventResponse = eventResponse
-            //view.showEventList(eventResponse.events)
-            eventResponse.events }
+          .map{ eventResponse -> eventResponse.events }
           .observeOn(AndroidSchedulers.mainThread())
           .doOnNext{
             events -> view.hideLoading()
             view.showEventList(events)
           }
           .doOnError{
-            error ->
+            error -> view.showErrorMessage(error.message?:"Terjadi Error")
           }
           .observeOn(Schedulers.io())
           .flatMapIterable { events -> events }
@@ -95,7 +65,6 @@ class MainPresenter (
                 view.showEventList(result)
               },
               {error -> view.hideLoading()
-                Log.d("tes123", "hahaha")
                 view.showErrorMessage(error.localizedMessage)}
           )
     }

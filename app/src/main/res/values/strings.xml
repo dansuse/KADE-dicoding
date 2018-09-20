@@ -13,6 +13,7 @@
     <string name="substitutes">Substitutes</string>
 
     <string name="detail_activity_label">Match Detail</string>
+    <string name="main_activity_label">Football Match Schedule</string>
 
     <array name="league">
         <item>English Premier League</item>
