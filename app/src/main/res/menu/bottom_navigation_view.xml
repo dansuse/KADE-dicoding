@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_prev_match"
+        android:enabled="true"
+        android:icon="@drawable/prev_match_icon"
+        android:title="@string/text_prev_match"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_next_match"
+        android:enabled="true"
+        android:icon="@drawable/next_match_icon"
+        android:title="@string/text_next_match"
+        app:showAsAction="ifRoom" />
+</menu>

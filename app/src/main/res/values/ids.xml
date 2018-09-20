@@ -1,5 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="team_badge" type="id"/>
-    <item name="team_name" type="id"/>
+    <item name="team_name_home" type="id"/>
+    <item name="team_name_away" type="id"/>
+    <item name="team_badge_home" type="id"/>
+    <item name="team_badge_away" type="id"/>
+    <item name="match_score" type="id"/>
+    <item name="match_date" type="id"/>
+    <item name="bottom_navigation_bar" type="id"/>
+    <item name="home_badge_progress_bar" type="id"/>
+    <item name="away_badge_progress_bar" type="id"/>
+
+    <item name="home_formation" type="id"/>
+    <item name="away_formation" type="id"/>
+
+    <item name="detail_activity_progress_bar" type="id"/>
+    <item name="detail_activity_scroll_view" type="id"/>
+
+    <item name="goals_label_text" type="id"/>
+    <item name="home_goals" type="id"/>
+    <item name="away_goals" type="id"/>
+
+    <item name="shots_label_text" type="id"/>
+    <item name="home_shots" type="id"/>
+    <item name="away_shots" type="id"/>
+
+    <item name="goal_keeper_label_text" type="id"/>
+    <item name="home_goal_keeper" type="id"/>
+    <item name="away_goal_keeper" type="id"/>
+
+    <item name="defense_label_text" type="id"/>
+    <item name="home_defense" type="id"/>
+    <item name="away_defense" type="id"/>
+
+    <item name="midfield_label_text" type="id"/>
+    <item name="home_midfield" type="id"/>
+    <item name="away_midfield" type="id"/>
+
+    <item name="forward_label_text" type="id"/>
+    <item name="home_forward" type="id"/>
+    <item name="away_forward" type="id"/>
+
+    <item name="substitutes_label_text" type="id"/>
+    <item name="home_substitutes" type="id"/>
+    <item name="away_substitutes" type="id"/>
+
+    <item name="error_message" type="id"/>
 </resources>
