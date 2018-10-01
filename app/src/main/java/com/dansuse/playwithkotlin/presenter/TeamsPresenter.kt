@@ -3,13 +3,13 @@ package com.dansuse.playwithkotlin.presenter
 import com.dansuse.playwithkotlin.model.TeamResponse
 import com.dansuse.playwithkotlin.repository.ApiRepository
 import com.dansuse.playwithkotlin.repository.TheSportDBApi
-import com.dansuse.playwithkotlin.view.MainView
+import com.dansuse.playwithkotlin.view.TeamsView
 import com.google.gson.Gson
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
-class MainPresenter (
-    private val view: MainView,
+class TeamsPresenter (
+    private val view: TeamsView,
     private val apiRepository: ApiRepository,
     private val gson: Gson){
   fun getTeamList(league: String?){

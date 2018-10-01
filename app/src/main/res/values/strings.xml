@@ -8,4 +8,6 @@
         <item>French Ligue 1</item>
         <item>Spanish La Liga</item>
     </array>
+    <string name="teams">Teams</string>
+    <string name="favorites">Favorites</string>
 </resources>
