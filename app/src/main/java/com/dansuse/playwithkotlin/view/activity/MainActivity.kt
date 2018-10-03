@@ -35,55 +35,9 @@ class MainActivity : AppCompatActivity(), TeamsView {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    linearLayout {
-      lparams (width = matchParent, height = wrapContent)
-      orientation = LinearLayout.VERTICAL
-      topPadding = dip(16)
-      leftPadding = dip(16)
-      rightPadding = dip(16)
 
-      spinner = spinner ()
-      swipeRefresh = swipeRefreshLayout {
-        setColorSchemeResources(colorAccent,
-            android.R.color.holo_green_light,
-            android.R.color.holo_orange_light,
-            android.R.color.holo_red_light)
 
-        relativeLayout{
-          lparams (width = matchParent, height = wrapContent)
 
-          listTeam = recyclerView {
-            lparams (width = matchParent, height = wrapContent)
-            layoutManager = LinearLayoutManager(ctx)
-          }
-
-          progressBar = progressBar {
-          }.lparams{
-            centerHorizontally()
-          }
-        }
-      }
-    }
-
-    adapter = TeamsAdapter(teams)
-    listTeam.adapter = adapter
-
-    val request = ApiRepository()
-    val gson = Gson()
-    presenter = TeamsPresenter(this, request, gson)
-
-    val spinnerItems = resources.getStringArray(R.array.league)
-    val spinnerAdapter = ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item, spinnerItems)
-    spinner.adapter = spinnerAdapter
-
-    spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-      override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        leagueName = spinner.selectedItem.toString()
-        presenter.getTeamList(leagueName)
-      }
-
-      override fun onNothingSelected(parent: AdapterView<*>?) {}
-    }
   }
 
   override fun showLoading() {
