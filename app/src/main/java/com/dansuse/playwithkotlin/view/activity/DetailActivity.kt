@@ -1,5 +1,6 @@
 package com.dansuse.playwithkotlin.view.activity
 
+import android.database.sqlite.SQLiteConstraintException
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -7,17 +8,26 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.dansuse.playwithkotlin.R
+import com.dansuse.playwithkotlin.database.database
 import com.dansuse.playwithkotlin.invisible
 import com.dansuse.playwithkotlin.model.Event
+import com.dansuse.playwithkotlin.model.Favorite
 import com.dansuse.playwithkotlin.presenter.DetailPresenter
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
 import com.dansuse.playwithkotlin.view.DetailView
 import com.dansuse.playwithkotlin.visible
 import com.squareup.picasso.Picasso
 import org.jetbrains.anko.*
+import org.jetbrains.anko.db.classParser
+import org.jetbrains.anko.db.delete
+import org.jetbrains.anko.db.insert
+import org.jetbrains.anko.db.select
+import org.jetbrains.anko.design.snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -109,6 +119,15 @@ class DetailActivity : AppCompatActivity(), DetailView {
     find<TextView>(R.id.error_message)
   }
 
+  private val frameLayout by lazy{
+    find<FrameLayout>(R.id.detail_view)
+  }
+
+  private var menuItem: Menu? = null
+  private var isFavorite: Boolean = false
+  private var event:Event? = null
+  private lateinit var eventId:String
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -135,8 +154,90 @@ class DetailActivity : AppCompatActivity(), DetailView {
     presenter = DetailPresenter(this, TheSportDBApiService.create())
 
     val intent = intent
-    val eventId = intent.getStringExtra("event")
+    eventId = intent.getStringExtra("event")
+    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    favoriteState()
     presenter.getEventDetailById(eventId)
+
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    menuInflater.inflate(R.menu.detail_menu, menu)
+    menuItem = menu
+    setFavorite()
+    return true
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    return when (item?.itemId) {
+      android.R.id.home -> {
+        finish()
+        true
+      }
+      R.id.add_to_favorite -> {
+        if (isFavorite) removeFromFavorite() else addToFavorite()
+
+        setFavorite()
+        true
+      }
+
+      else -> super.onOptionsItemSelected(item)
+    }
+  }
+
+  private fun setFavorite() {
+    if (isFavorite)
+      menuItem?.getItem(0)?.icon = ContextCompat.getDrawable(this, R.drawable.ic_added_to_favorites)
+    else
+      menuItem?.getItem(0)?.icon = ContextCompat.getDrawable(this, R.drawable.ic_add_to_favorites)
+  }
+
+  private fun favoriteState(){
+    database.use {
+      val result = select(Favorite.TABLE_FAVORITE)
+              .whereArgs("(${Favorite.EVENT_ID} = {id})",
+                      "id" to eventId)
+      val favorite = result.parseList(classParser<Favorite>())
+      if (!favorite.isEmpty()) isFavorite = true
+    }
+  }
+
+  private fun addToFavorite(){
+    if(event != null){
+      try {
+        database.use {
+          insert(Favorite.TABLE_FAVORITE,
+                  Favorite.EVENT_ID to event?.id,
+                  Favorite.EVENT_DATE to event?.date,
+                  Favorite.HOME_SCORE to event?.homeScore,
+                  Favorite.AWAY_SCORE to event?.awayScore,
+                  Favorite.HOME_NAME to event?.homeTeamName,
+                  Favorite.AWAY_NAME to event?.awayTeamName,
+                  Favorite.HOME_BADGE to event?.homeBadge,
+                  Favorite.AWAY_BADGE to event?.awayBadge
+                  )
+        }
+        isFavorite = true
+        snackbar(frameLayout, getString(R.string.event_added_to_favorites)).show()
+      } catch (e: SQLiteConstraintException){
+        snackbar(frameLayout, e.localizedMessage).show()
+      }
+    }else{
+      snackbar(frameLayout, getString(R.string.event_is_still_loading)).show()
+    }
+  }
+
+  private fun removeFromFavorite(){
+    try {
+      database.use {
+        delete(Favorite.TABLE_FAVORITE, "(${Favorite.EVENT_ID} = {id})",
+                "id" to eventId)
+      }
+      isFavorite = false
+      snackbar(frameLayout, getString(R.string.event_removed_from_favorites)).show()
+    } catch (e: SQLiteConstraintException){
+      snackbar(frameLayout, e.localizedMessage).show()
+    }
   }
 
   override fun onDestroy() {
@@ -164,6 +265,7 @@ class DetailActivity : AppCompatActivity(), DetailView {
   }
 
   override fun showEventDetail(event: Event) {
+    this.event = event
     matchScore.text = getString(R.string.match_score, event.homeScore?:'-', event.awayScore?:'-')
     homeTeamName.text = event.homeTeamName
     awayTeamName.text = event.awayTeamName
@@ -214,7 +316,6 @@ class DetailActivity : AppCompatActivity(), DetailView {
     matchDate.text = outputFormat.format(date)
   }
 
-
 }
 
 class DetailActivityUI:AnkoComponent<DetailActivity>{
@@ -222,6 +323,7 @@ class DetailActivityUI:AnkoComponent<DetailActivity>{
     return with(ui) {
       frameLayout {
         lparams(width = matchParent, height = matchParent)
+        id = R.id.detail_view
         scrollView {
           id=R.id.detail_activity_scroll_view
           visibility = View.INVISIBLE

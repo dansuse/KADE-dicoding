@@ -45,4 +45,7 @@
     <item name="away_substitutes" type="id"/>
 
     <item name="error_message" type="id"/>
+
+    <item name="main_container" type="id"/>
+    <item name="detail_view" type="id"/>
 </resources>

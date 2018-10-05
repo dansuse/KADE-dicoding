@@ -12,26 +12,26 @@ import android.widget.TextView
 import com.dansuse.playwithkotlin.R
 import com.dansuse.playwithkotlin.invisible
 import com.dansuse.playwithkotlin.model.Event
-import com.dansuse.playwithkotlin.view.activity.OnItemClick
 import com.dansuse.playwithkotlin.visible
 import com.squareup.picasso.Picasso
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainAdapter (private val events: List<Event>, private val clickHandler: OnItemClick) : RecyclerView.Adapter<MatchViewHolder>(){
+class MainAdapter (private val events: List<Event>, private val listener: (Event) -> Unit) : RecyclerView.Adapter<MatchViewHolder>(){
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MatchViewHolder {
-    return MatchViewHolder(MatchUI().createView(AnkoContext.create(parent.context, parent)), clickHandler)
+    return MatchViewHolder(MatchUI().createView(AnkoContext.create(parent.context, parent)))
   }
 
   override fun getItemCount(): Int = events.size
 
   override fun onBindViewHolder(holder: MatchViewHolder, position: Int) {
-    holder.bindItem(events[position])
+    holder.bindItem(events[position], listener)
   }
 }
 
-class MatchViewHolder(view: View, private val clickHandler: OnItemClick): RecyclerView.ViewHolder(view), View.OnClickListener{
+class MatchViewHolder(view: View): RecyclerView.ViewHolder(view){
   private val teamBadgeHome: ImageView = view.find(R.id.team_badge_home)
   private val teamNameHome: TextView = view.find(R.id.team_name_home)
   private val teamBadgeAway: ImageView = view.find(R.id.team_badge_away)
@@ -42,13 +42,12 @@ class MatchViewHolder(view: View, private val clickHandler: OnItemClick): Recycl
   private val progressBarAwayBadge:ProgressBar = view.find(R.id.away_badge_progress_bar)
   private lateinit var event:Event
 
-  override fun onClick(v: View?) {
-    clickHandler.onItemClick(event)
-  }
 
-  fun bindItem(event: Event){
+  fun bindItem(event: Event, listener: (Event) -> Unit){
     this.event = event
-    itemView.setOnClickListener(this)
+    itemView.onClick {
+      listener(event)
+    }
 
     val inputFormat = SimpleDateFormat("dd/MM/yy", Locale.US)
     val date:Date = inputFormat.parse(event.date)

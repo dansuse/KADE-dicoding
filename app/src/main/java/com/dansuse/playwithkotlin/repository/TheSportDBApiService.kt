@@ -15,8 +15,8 @@ import retrofit2.http.Query
 
 interface TheSportDBApiService {
   companion object {
-    val MODE_PAST_15_EVENTS = "eventspastleague.php"
-    val MODE_NEXT_15_EVENTS = "eventsnextleague.php"
+    const val MODE_PAST_15_EVENTS = "eventspastleague.php"
+    const val MODE_NEXT_15_EVENTS = "eventsnextleague.php"
     fun create():TheSportDBApiService{
       val retrofit = Retrofit.Builder()
           .addCallAdapterFactory(RxJava2CallAdapterFactory.create())

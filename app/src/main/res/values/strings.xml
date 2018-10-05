@@ -11,6 +11,10 @@
     <string name="midfield">Midfield</string>
     <string name="forward">Forward</string>
     <string name="substitutes">Substitutes</string>
+    <string name="favorites">Favorites</string>
+    <string name="event_added_to_favorites">Added to favorite</string>
+    <string name="event_removed_from_favorites">Removed from favorite</string>
+    <string name="event_is_still_loading">Event is still loading</string>
 
     <string name="detail_activity_label">Match Detail</string>
     <string name="main_activity_label">Football Match Schedule</string>

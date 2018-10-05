@@ -13,4 +13,10 @@
         android:icon="@drawable/next_match_icon"
         android:title="@string/text_next_match"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_favorites"
+        android:enabled="true"
+        android:icon="@drawable/ic_favorites"
+        android:title="@string/favorites"
+        app:showAsAction="ifRoom" />
 </menu>
