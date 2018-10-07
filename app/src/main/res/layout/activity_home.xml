@@ -10,7 +10,10 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_layout"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
+    <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/list_team"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>-->
     <LinearLayout
         android:id="@+id/bottom_layout"
         android:layout_width="match_parent"

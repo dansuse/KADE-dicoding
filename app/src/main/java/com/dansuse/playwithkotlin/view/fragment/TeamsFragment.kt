@@ -2,6 +2,7 @@ package com.dansuse.playwithkotlin.view.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
@@ -16,6 +17,7 @@ import com.dansuse.playwithkotlin.model.Team
 import com.dansuse.playwithkotlin.presenter.TeamsPresenter
 import com.dansuse.playwithkotlin.repository.ApiRepository
 import com.dansuse.playwithkotlin.teamdetail.TeamDetailActivity
+import com.dansuse.playwithkotlin.view.CoroutineContextProvider
 import com.dansuse.playwithkotlin.view.TeamsView
 import com.dansuse.playwithkotlin.view.adapter.TeamsAdapter
 import com.dansuse.playwithkotlin.visible
@@ -24,6 +26,7 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.support.v4.ctx
 import org.jetbrains.anko.support.v4.swipeRefreshLayout
+
 
 class TeamsFragment : Fragment(), AnkoComponent<Context>, TeamsView {
 
@@ -37,6 +40,8 @@ class TeamsFragment : Fragment(), AnkoComponent<Context>, TeamsView {
   private lateinit var adapter: TeamsAdapter
   private lateinit var leagueName: String
 
+  private val idlingRes : CountingIdlingResource = CountingIdlingResource("TeamsFragment")
+
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
 
@@ -47,7 +52,7 @@ class TeamsFragment : Fragment(), AnkoComponent<Context>, TeamsView {
 
     val request = ApiRepository()
     val gson = Gson()
-    presenter = TeamsPresenter(this, request, gson)
+    presenter = TeamsPresenter(this, request, gson, CoroutineContextProvider(), idlingRes)
 
     val spinnerItems = resources.getStringArray(R.array.league)
     val spinnerAdapter = ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item, spinnerItems)
@@ -69,7 +74,7 @@ class TeamsFragment : Fragment(), AnkoComponent<Context>, TeamsView {
 
   override fun createView(ui: AnkoContext<Context>): View = with(ui){
     linearLayout {
-      lparams (width = matchParent, height = wrapContent)
+      lparams (width = matchParent, height = matchParent)
       orientation = LinearLayout.VERTICAL
       topPadding = dip(16)
       leftPadding = dip(16)
@@ -83,10 +88,11 @@ class TeamsFragment : Fragment(), AnkoComponent<Context>, TeamsView {
                 android.R.color.holo_red_light)
 
         relativeLayout{
-          lparams (width = matchParent, height = wrapContent)
+          lparams (width = matchParent, height = matchParent)
 
           listTeam = recyclerView {
-            lparams (width = matchParent, height = wrapContent)
+            id = R.id.list_team
+            lparams (width = matchParent, height = matchParent)
             layoutManager = LinearLayoutManager(ctx)
           }
 
@@ -112,5 +118,9 @@ class TeamsFragment : Fragment(), AnkoComponent<Context>, TeamsView {
     teams.clear()
     teams.addAll(data)
     adapter.notifyDataSetChanged()
+  }
+
+  fun getIdlingResourceInTest():CountingIdlingResource{
+    return idlingRes
   }
 }
