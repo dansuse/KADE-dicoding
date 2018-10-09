@@ -15,7 +15,7 @@ import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.visible
 import com.squareup.picasso.Picasso
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.text.SimpleDateFormat
 import java.util.*
 
