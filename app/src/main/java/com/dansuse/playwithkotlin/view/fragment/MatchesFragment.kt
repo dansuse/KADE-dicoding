@@ -2,6 +2,7 @@ package com.dansuse.playwithkotlin.view.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
@@ -22,6 +23,8 @@ import com.dansuse.playwithkotlin.view.MainView
 import com.dansuse.playwithkotlin.view.activity.DetailActivity
 import com.dansuse.playwithkotlin.view.adapter.MainAdapter
 import com.dansuse.playwithkotlin.visible
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.support.v4.ctx
@@ -44,6 +47,8 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
     private var leagueId: String? = null
     private var isPrevMatchMode:Boolean = true
 
+    private val idlingRes : CountingIdlingResource = CountingIdlingResource("MatchesFragment")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.getBoolean(MatchesFragment.KEY_IS_PREV_MATCH_MODE)?.let {
@@ -63,11 +68,13 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
         }
 
         adapter = MainAdapter(events){
-            ctx.startActivity<DetailActivity>("event" to it.id)
+            context?.startActivity<DetailActivity>("event" to it.id)
         }
         listTeam.adapter = adapter
 
-        presenter = MainPresenter(this, TheSportDBApiService.create())
+        presenter = MainPresenter(this, TheSportDBApiService.create(),
+                Schedulers.io(), AndroidSchedulers.mainThread(),
+                idlingRes)
         presenter.getLeagueList()
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
@@ -86,12 +93,12 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return createView(AnkoContext.create(ctx))
+        return createView(AnkoContext.create(requireContext()))
     }
 
     override fun createView(ui: AnkoContext<Context>): View = with(ui) {
         linearLayout {
-            lparams (width = matchParent, height = wrapContent)
+            lparams (width = matchParent, height = matchParent)
             orientation = LinearLayout.VERTICAL
             topPadding = dip(16)
 
@@ -106,10 +113,11 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
                         android.R.color.holo_red_light)
 
                 frameLayout{
-                    lparams (width = matchParent, height = wrapContent)
+                    lparams (width = matchParent, height = matchParent)
 
                     listTeam = recyclerView {
-                        lparams (width = matchParent, height = wrapContent)
+                        id = R.id.list_event
+                        lparams (width = matchParent, height = matchParent)
                         layoutManager = LinearLayoutManager(ctx)
                     }
                     textViewErrorMessage = textView {
@@ -135,7 +143,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
     }
 
     override fun showLeagueList(data: List<League>) {
-        val spinnerAdapter = ArrayAdapter(ctx, android.R.layout.simple_spinner_dropdown_item, data)
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, data)
         spinner.adapter = spinnerAdapter
     }
 
@@ -158,5 +166,9 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
     override fun onDestroy() {
         presenter.dispose()
         super.onDestroy()
+    }
+
+    fun getIdlingResourceInTest():CountingIdlingResource{
+        return idlingRes
     }
 }

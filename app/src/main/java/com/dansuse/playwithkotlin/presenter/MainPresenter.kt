@@ -1,9 +1,11 @@
 package com.dansuse.playwithkotlin.presenter
 
+import android.support.test.espresso.idling.CountingIdlingResource
 import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.TeamResponse
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
 import com.dansuse.playwithkotlin.view.MainView
+import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -12,18 +14,24 @@ import io.reactivex.schedulers.Schedulers
 
 class MainPresenter (
     private val view: MainView,
-    private val theSportDBApiService: TheSportDBApiService){
+    private val theSportDBApiService: TheSportDBApiService,
+    private val processScheduler: Scheduler,
+    private val androidScheduler: Scheduler,
+    private val idlingRes: CountingIdlingResource){
 
   fun getLeagueList(){
+      idlingRes.increment()
     leagueDisposable = theSportDBApiService.getAllLeagues()
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeOn(processScheduler)
+        .observeOn(androidScheduler)
         .subscribe({
           leagueResponse -> view.hideLoading()
           view.showLeagueList(leagueResponse.leagues)
+            idlingRes.decrement()
         },
         {error ->
-          view.showErrorMessage(error.message ?: "Terjadi kesalahan saat mencoba mengambil data")}
+          view.showErrorMessage(error.message ?: "Terjadi kesalahan saat mencoba mengambil data")
+            idlingRes.decrement()}
         )
   }
 
@@ -32,13 +40,14 @@ class MainPresenter (
 
   fun get15EventsByLeagueId(leagueId:String, isPrevMatchMode:Boolean){
     if(leagueId != ""){
+        idlingRes.increment()
       view.showLoading()
       eventDisposable = theSportDBApiService.get15EventsByLeagueId(
           if(isPrevMatchMode) TheSportDBApiService.MODE_PAST_15_EVENTS
           else TheSportDBApiService.MODE_NEXT_15_EVENTS,
           leagueId.toInt())
           .map{ eventResponse -> eventResponse.events }
-          .observeOn(AndroidSchedulers.mainThread())
+          .observeOn(androidScheduler)
           .doOnNext{
             events -> view.hideLoading()
             view.showEventList(events)
@@ -46,7 +55,7 @@ class MainPresenter (
           .doOnError{
             error -> view.showErrorMessage(error.message?:"Terjadi Error")
           }
-          .observeOn(Schedulers.io())
+          .observeOn(processScheduler)
           .flatMapIterable { events -> events }
           .flatMap { event -> Single.zip(
               theSportDBApiService.getTeamDetail(event.homeTeamId.toInt()),
@@ -58,14 +67,16 @@ class MainPresenter (
           }
           ).toObservable()
           }.toList()
-          .subscribeOn(Schedulers.io())
-          .observeOn(AndroidSchedulers.mainThread())
+          .subscribeOn(processScheduler)
+          .observeOn(androidScheduler)
           .subscribe(
               {result -> view.hideLoading()
                 view.showEventList(result)
+                  idlingRes.decrement()
               },
               {error -> view.hideLoading()
-                view.showErrorMessage(error.localizedMessage)}
+                view.showErrorMessage(error.localizedMessage)
+                  idlingRes.decrement()}
           )
     }
   }
