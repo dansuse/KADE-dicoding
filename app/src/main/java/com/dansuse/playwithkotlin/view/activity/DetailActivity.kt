@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteConstraintException
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
@@ -32,6 +33,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class DetailActivity : AppCompatActivity(), DetailView {
+
+  companion object {
+    var presenter: DetailPresenter? = null
+  }
 
   private lateinit var presenter: DetailPresenter
 
@@ -128,6 +133,8 @@ class DetailActivity : AppCompatActivity(), DetailView {
   private var event:Event? = null
   private lateinit var eventId:String
 
+  private val idlingRes : CountingIdlingResource = CountingIdlingResource("DetailActivity")
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -151,7 +158,7 @@ class DetailActivity : AppCompatActivity(), DetailView {
     detailActivityProgressBar = find(R.id.detail_activity_progress_bar)
     scrollView = find(R.id.detail_activity_scroll_view)
 
-    presenter = DetailPresenter(this, TheSportDBApiService.create())
+    initPresenter()
 
     val intent = intent
     eventId = intent.getStringExtra("event")
@@ -159,6 +166,14 @@ class DetailActivity : AppCompatActivity(), DetailView {
     favoriteState()
     presenter.getEventDetailById(eventId)
 
+  }
+
+  private fun initPresenter(){
+    Companion.presenter?.let { this.presenter = it }
+    if(this::presenter.isInitialized){
+      return
+    }
+    presenter = DetailPresenter(this, TheSportDBApiService.create(), idlingRes)
   }
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -218,12 +233,12 @@ class DetailActivity : AppCompatActivity(), DetailView {
                   )
         }
         isFavorite = true
-        snackbar(frameLayout, getString(R.string.event_added_to_favorites)).show()
+        frameLayout.snackbar(getString(R.string.event_added_to_favorites)).show()
       } catch (e: SQLiteConstraintException){
-        snackbar(frameLayout, e.localizedMessage).show()
+        frameLayout.snackbar(e.localizedMessage).show()
       }
     }else{
-      snackbar(frameLayout, getString(R.string.event_is_still_loading)).show()
+      frameLayout.snackbar(getString(R.string.event_is_still_loading)).show()
     }
   }
 
@@ -234,9 +249,9 @@ class DetailActivity : AppCompatActivity(), DetailView {
                 "id" to eventId)
       }
       isFavorite = false
-      snackbar(frameLayout, getString(R.string.event_removed_from_favorites)).show()
+      frameLayout.snackbar(getString(R.string.event_removed_from_favorites)).show()
     } catch (e: SQLiteConstraintException){
-      snackbar(frameLayout, e.localizedMessage).show()
+      frameLayout.snackbar(e.localizedMessage).show()
     }
   }
 
@@ -314,6 +329,10 @@ class DetailActivity : AppCompatActivity(), DetailView {
     val date: Date = inputFormat.parse(event.date)
     val outputFormat = SimpleDateFormat("E, dd MMM yyyy")
     matchDate.text = outputFormat.format(date)
+  }
+
+  fun getIdlingResourceInTest():CountingIdlingResource{
+    return idlingRes
   }
 
 }

@@ -1,6 +1,7 @@
 package com.dansuse.playwithkotlin.presenter
 
 import android.support.test.espresso.idling.CountingIdlingResource
+import com.dansuse.playwithkotlin.EspressoIdlingResource
 import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.TeamResponse
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
@@ -12,35 +13,35 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 
-class MainPresenter (
+open class MainPresenter (
     private val view: MainView,
     private val theSportDBApiService: TheSportDBApiService,
     private val processScheduler: Scheduler,
-    private val androidScheduler: Scheduler,
-    private val idlingRes: CountingIdlingResource){
+    private val androidScheduler: Scheduler){
 
-  fun getLeagueList(){
-      idlingRes.increment()
+  open fun getLeagueList(){
+      EspressoIdlingResource.mCountingIdlingResource.increment()
     leagueDisposable = theSportDBApiService.getAllLeagues()
         .subscribeOn(processScheduler)
         .observeOn(androidScheduler)
         .subscribe({
           leagueResponse -> view.hideLoading()
           view.showLeagueList(leagueResponse.leagues)
-            idlingRes.decrement()
+            EspressoIdlingResource.mCountingIdlingResource.decrement()
         },
         {error ->
           view.showErrorMessage(error.message ?: "Terjadi kesalahan saat mencoba mengambil data")
-            idlingRes.decrement()}
+            EspressoIdlingResource.mCountingIdlingResource.decrement()
+        }
         )
   }
 
   var eventDisposable: Disposable?=null
   var leagueDisposable: Disposable?=null
 
-  fun get15EventsByLeagueId(leagueId:String, isPrevMatchMode:Boolean){
+  open fun get15EventsByLeagueId(leagueId:String, isPrevMatchMode:Boolean){
     if(leagueId != ""){
-        idlingRes.increment()
+        EspressoIdlingResource.mCountingIdlingResource.increment()
       view.showLoading()
       eventDisposable = theSportDBApiService.get15EventsByLeagueId(
           if(isPrevMatchMode) TheSportDBApiService.MODE_PAST_15_EVENTS
@@ -72,11 +73,12 @@ class MainPresenter (
           .subscribe(
               {result -> view.hideLoading()
                 view.showEventList(result)
-                  idlingRes.decrement()
+                  EspressoIdlingResource.mCountingIdlingResource.decrement()
               },
               {error -> view.hideLoading()
                 view.showErrorMessage(error.localizedMessage)
-                  idlingRes.decrement()}
+                  EspressoIdlingResource.mCountingIdlingResource.decrement()
+              }
           )
     }
   }

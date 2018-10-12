@@ -1,5 +1,7 @@
 package com.dansuse.playwithkotlin.presenter
 
+import android.support.test.espresso.idling.CountingIdlingResource
+import com.dansuse.playwithkotlin.EspressoIdlingResource
 import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.TeamResponse
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
@@ -10,13 +12,16 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 
-class DetailPresenter (
+open class DetailPresenter (
     private val view: DetailView,
-    private val theSportDBApiService: TheSportDBApiService){
+    private val theSportDBApiService: TheSportDBApiService,
+    private val idlingRes:CountingIdlingResource){
 
   var disposable: Disposable?=null
 
-  fun getEventDetailById(eventId:String){
+  open fun getEventDetailById(eventId:String){
+      EspressoIdlingResource.mCountingIdlingResource.increment()
+      idlingRes.increment()
     view.showLoading()
     disposable = theSportDBApiService.getEventDetail(eventId.toInt())
         .map{ eventResponse -> eventResponse.events[0] }
@@ -40,9 +45,13 @@ class DetailPresenter (
         .subscribe(
             {result -> view.hideLoading()
               view.showEventDetail(result)
+                idlingRes.decrement()
+                EspressoIdlingResource.mCountingIdlingResource.decrement()
             },
             {error -> view.hideLoading()
               view.showErrorMessage(error.localizedMessage)
+                idlingRes.decrement()
+                EspressoIdlingResource.mCountingIdlingResource.decrement()
             }
         )
 

@@ -34,7 +34,7 @@ class FavoriteMatchesFragment : Fragment(), AnkoComponent<Context> {
         super.onActivityCreated(savedInstanceState)
 
         adapter = FavoriteTeamsAdapter(favorites){
-            ctx.startActivity<DetailActivity>("event" to "${it.eventId}")
+            requireContext().startActivity<DetailActivity>("event" to "${it.eventId}")
         }
 
         listEvent.adapter = adapter
@@ -46,7 +46,7 @@ class FavoriteMatchesFragment : Fragment(), AnkoComponent<Context> {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return createView(AnkoContext.create(ctx))
+        return createView(AnkoContext.create(requireContext()))
     }
 
     override fun createView(ui: AnkoContext<Context>): View = with(ui){

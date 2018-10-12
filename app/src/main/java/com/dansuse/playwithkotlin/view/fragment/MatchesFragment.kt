@@ -34,6 +34,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
 
     companion object {
         const val KEY_IS_PREV_MATCH_MODE = "key_is_prev_match_mode"
+        var presenter: MainPresenter? = null
     }
 
     private lateinit var listTeam: RecyclerView
@@ -72,9 +73,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
         }
         listTeam.adapter = adapter
 
-        presenter = MainPresenter(this, TheSportDBApiService.create(),
-                Schedulers.io(), AndroidSchedulers.mainThread(),
-                idlingRes)
+        initPresenter()
         presenter.getLeagueList()
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
@@ -90,6 +89,15 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+    }
+
+    private fun initPresenter(){
+        Companion.presenter?.let { this.presenter = it }
+        if(this::presenter.isInitialized){
+            return
+        }
+        presenter = MainPresenter(this, TheSportDBApiService.create(),
+                Schedulers.io(), AndroidSchedulers.mainThread())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -148,6 +156,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
     }
 
     override fun showEventList(data: List<Event>) {
+        Log.d("tes123", "Terpanggil")
         hideLoading()
         textViewErrorMessage.invisible()
         listTeam.visible()
