@@ -50,4 +50,5 @@
     <item name="detail_view" type="id"/>
 
     <item name="list_event" type="id"/>
+    <item name="spinner_league" type="id"/>
 </resources>

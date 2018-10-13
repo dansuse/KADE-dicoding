@@ -1,13 +1,16 @@
 package com.dansuse.playwithkotlin
 
 import android.content.Intent
+import android.os.SystemClock
 import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.Espresso.pressBack
+import android.support.test.espresso.Espresso.*
 import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.RecyclerViewActions
+import android.support.test.espresso.intent.Intents
+import android.support.test.espresso.intent.Intents.intended
+import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
@@ -22,6 +25,8 @@ import com.dansuse.playwithkotlin.view.MainView
 import com.dansuse.playwithkotlin.view.activity.DetailActivity
 import com.dansuse.playwithkotlin.view.activity.MainActivity
 import com.dansuse.playwithkotlin.view.fragment.MatchesFragment
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -30,12 +35,87 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.*
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
+import android.support.test.espresso.Espresso.onData
+
+
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
     private val mainPresenter = Mockito.mock(MainPresenter::class.java)
     private val detailPresenter = Mockito.mock(DetailPresenter::class.java)
+
+    val events = listOf(
+            Event(
+                    id = "576548",
+                    date = "07/10/18",
+                    homeScore = "1",
+                    awayScore = "5",
+                    homeTeamName = "Fulham",
+                    awayTeamName = "Arsenal",
+                    homeFormation = "",
+                    awayFormation = "",
+                    homeGoalDetails = "44':Andre Schuerrle;",
+                    awayGoalDetails = "29':Alexandre Lacazette;49':Alexandre Lacazette;68':Aaron Ramsey;79':Pierre-Emerick Aubameyang;90':Pierre-Emerick Aubameyang;",
+                    homeShots = null,
+                    awayShots = null,
+                    homeGoalKeeper = "Marcus Bettinelli; ",
+                    awayGoalKeeper = "Bernd Leno; ",
+                    homeLineupDefense = "Denis Odoi; Tim Ream; Alfie Mawson; Maxime Le Marchand; ",
+                    homeLineupMidfield = "Tom Cairney; Jean Michael Seri; Andre Schuerrle; Luciano Dario Vietto; Ryan Sessegnon; ",
+                    homeLineupForward = "Aleksandar Mitrovic; ",
+                    homeLineupSubstitutes = "Sergio Rico; Alfie Mawson; Kevin McDonald; Stefan Johansen; Steven Sessegnon; Floyd Ayite; Aboubakar Kamara; ",
+                    homeTeamId = "133600",
+                    awayLineupDefense = "Hector Bellerin; Shkodran Mustafi; Sokratis Papastathopoulos; Nacho Monreal; ",
+                    awayLineupMidfield = "Lucas Torreira; Granit Xhaka; Mesut Oezil; Aaron Ramsey; Pierre-Emerick Aubameyang; ",
+                    awayLineupForward = "Alexandre Lacazette; ",
+                    awayLineupSubstitutes = "Emiliano Martinez; Sokratis Papastathopoulos; Stephan Lichtsteiner; Sead Kolasinac; Aaron Ramsey; Matteo Guendouzi; Pierre-Emerick Aubameyang; ",
+                    awayTeamId = "133604",
+                    awayBadge = "https://www.thesportsdb.com/images/media/team/badge/vrtrtp1448813175.png",
+                    homeBadge = "https://www.thesportsdb.com/images/media/team/badge/xwwvyt1448811086.png"
+            ),
+            Event(
+                    id = "576543",
+                    date = "07/10/18",
+                    homeScore = "1",
+                    awayScore = "5",
+                    homeTeamName = "HAHAHA",
+                    awayTeamName = "HEHEHE",
+                    homeFormation = "",
+                    awayFormation = "",
+                    homeGoalDetails = "44':Andre Schuerrle;",
+                    awayGoalDetails = "29':Alexandre Lacazette;49':Alexandre Lacazette;68':Aaron Ramsey;79':Pierre-Emerick Aubameyang;90':Pierre-Emerick Aubameyang;",
+                    homeShots = null,
+                    awayShots = null,
+                    homeGoalKeeper = "Marcus Bettinelli; ",
+                    awayGoalKeeper = "Bernd Leno; ",
+                    homeLineupDefense = "Denis Odoi; Tim Ream; Alfie Mawson; Maxime Le Marchand; ",
+                    homeLineupMidfield = "Tom Cairney; Jean Michael Seri; Andre Schuerrle; Luciano Dario Vietto; Ryan Sessegnon; ",
+                    homeLineupForward = "Aleksandar Mitrovic; ",
+                    homeLineupSubstitutes = "Sergio Rico; Alfie Mawson; Kevin McDonald; Stefan Johansen; Steven Sessegnon; Floyd Ayite; Aboubakar Kamara; ",
+                    homeTeamId = "133600",
+                    awayLineupDefense = "Hector Bellerin; Shkodran Mustafi; Sokratis Papastathopoulos; Nacho Monreal; ",
+                    awayLineupMidfield = "Lucas Torreira; Granit Xhaka; Mesut Oezil; Aaron Ramsey; Pierre-Emerick Aubameyang; ",
+                    awayLineupForward = "Alexandre Lacazette; ",
+                    awayLineupSubstitutes = "Emiliano Martinez; Sokratis Papastathopoulos; Stephan Lichtsteiner; Sead Kolasinac; Aaron Ramsey; Matteo Guendouzi; Pierre-Emerick Aubameyang; ",
+                    awayTeamId = "133604",
+                    awayBadge = "https://www.thesportsdb.com/images/media/team/badge/vrtrtp1448813175.png",
+                    homeBadge = "https://www.thesportsdb.com/images/media/team/badge/xwwvyt1448811086.png"
+            )
+    )
+    val leagues = listOf(
+            League(
+                    id = "4328",
+                    leagueName = "English Premier League"
+            ),
+            League(
+                    id = "4329",
+                    leagueName = "English League Championship"
+            )
+    )
+
 
     @Rule
     @JvmField var mainActivityRule = object : ActivityTestRule<MainActivity>(MainActivity::class.java){
@@ -45,7 +125,28 @@ class MainActivityTest {
 //            MatchesFragment.presenter = presenter
 //        }
         override fun beforeActivityLaunched() {
+//            doAnswer{
+//                this.activity.runOnUiThread {
+//                    //EspressoIdlingResource.mCountingIdlingResource.increment()
+//                    val matchesFragment:MatchesFragment = this.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+//                    matchesFragment.showLeagueList(leagues)
+//                    //EspressoIdlingResource.mCountingIdlingResource.decrement()
+//                }
+//                return@doAnswer null
+//            }.`when`(mainPresenter).getLeagueList()
+//
+//            doAnswer {
+//                this.activity.runOnUiThread {
+//                    //EspressoIdlingResource.mCountingIdlingResource.increment()
+//                    val matchesFragment:MatchesFragment = this.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+//                    matchesFragment.showEventList(events)
+//                    //EspressoIdlingResource.mCountingIdlingResource.decrement()
+//                }
+//            }.`when`(mainPresenter).get15EventsByLeagueId(
+//                    ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean())
+
             MatchesFragment.presenter = mainPresenter
+
         }
     }
 
@@ -67,78 +168,12 @@ class MainActivityTest {
     @Before
     fun setUp(){
         InstrumentationRegistry.getTargetContext().deleteDatabase("FavoriteEvent.db")
+        //Intents.init()
     }
 
     @Test
     fun testRecyclerViewBehaviour() {
-        val events = listOf<Event>(
-                Event(
-                    id = "576548",
-                        date = "07/10/18",
-                        homeScore = "1",
-                        awayScore = "5",
-                        homeTeamName = "Fulham",
-                        awayTeamName = "Arsenal",
-                        homeFormation = "",
-                        awayFormation = "",
-                        homeGoalDetails = "44':Andre Schuerrle;",
-                        awayGoalDetails = "29':Alexandre Lacazette;49':Alexandre Lacazette;68':Aaron Ramsey;79':Pierre-Emerick Aubameyang;90':Pierre-Emerick Aubameyang;",
-                    homeShots = null,
-                        awayShots = null,
-                    homeGoalKeeper = "Marcus Bettinelli; ",
-                        awayGoalKeeper = "Bernd Leno; ",
-                        homeLineupDefense = "Denis Odoi; Tim Ream; Alfie Mawson; Maxime Le Marchand; ",
-                        homeLineupMidfield = "Tom Cairney; Jean Michael Seri; Andre Schuerrle; Luciano Dario Vietto; Ryan Sessegnon; ",
-                        homeLineupForward = "Aleksandar Mitrovic; ",
-                        homeLineupSubstitutes = "Sergio Rico; Alfie Mawson; Kevin McDonald; Stefan Johansen; Steven Sessegnon; Floyd Ayite; Aboubakar Kamara; ",
-                        homeTeamId = "133600",
-                        awayLineupDefense = "Hector Bellerin; Shkodran Mustafi; Sokratis Papastathopoulos; Nacho Monreal; ",
-                        awayLineupMidfield = "Lucas Torreira; Granit Xhaka; Mesut Oezil; Aaron Ramsey; Pierre-Emerick Aubameyang; ",
-                        awayLineupForward = "Alexandre Lacazette; ",
-                        awayLineupSubstitutes = "Emiliano Martinez; Sokratis Papastathopoulos; Stephan Lichtsteiner; Sead Kolasinac; Aaron Ramsey; Matteo Guendouzi; Pierre-Emerick Aubameyang; ",
-                        awayTeamId = "133604",
-                        awayBadge = "https://www.thesportsdb.com/images/media/team/badge/vrtrtp1448813175.png",
-                        homeBadge = "https://www.thesportsdb.com/images/media/team/badge/xwwvyt1448811086.png"
-                ),
-                Event(
-                        id = "576543",
-                        date = "07/10/18",
-                        homeScore = "1",
-                        awayScore = "5",
-                        homeTeamName = "HAHAHA",
-                        awayTeamName = "HEHEHE",
-                        homeFormation = "",
-                        awayFormation = "",
-                        homeGoalDetails = "44':Andre Schuerrle;",
-                        awayGoalDetails = "29':Alexandre Lacazette;49':Alexandre Lacazette;68':Aaron Ramsey;79':Pierre-Emerick Aubameyang;90':Pierre-Emerick Aubameyang;",
-                        homeShots = null,
-                        awayShots = null,
-                        homeGoalKeeper = "Marcus Bettinelli; ",
-                        awayGoalKeeper = "Bernd Leno; ",
-                        homeLineupDefense = "Denis Odoi; Tim Ream; Alfie Mawson; Maxime Le Marchand; ",
-                        homeLineupMidfield = "Tom Cairney; Jean Michael Seri; Andre Schuerrle; Luciano Dario Vietto; Ryan Sessegnon; ",
-                        homeLineupForward = "Aleksandar Mitrovic; ",
-                        homeLineupSubstitutes = "Sergio Rico; Alfie Mawson; Kevin McDonald; Stefan Johansen; Steven Sessegnon; Floyd Ayite; Aboubakar Kamara; ",
-                        homeTeamId = "133600",
-                        awayLineupDefense = "Hector Bellerin; Shkodran Mustafi; Sokratis Papastathopoulos; Nacho Monreal; ",
-                        awayLineupMidfield = "Lucas Torreira; Granit Xhaka; Mesut Oezil; Aaron Ramsey; Pierre-Emerick Aubameyang; ",
-                        awayLineupForward = "Alexandre Lacazette; ",
-                        awayLineupSubstitutes = "Emiliano Martinez; Sokratis Papastathopoulos; Stephan Lichtsteiner; Sead Kolasinac; Aaron Ramsey; Matteo Guendouzi; Pierre-Emerick Aubameyang; ",
-                        awayTeamId = "133604",
-                        awayBadge = "https://www.thesportsdb.com/images/media/team/badge/vrtrtp1448813175.png",
-                        homeBadge = "https://www.thesportsdb.com/images/media/team/badge/xwwvyt1448811086.png"
-                )
-        )
-        val leagues = listOf<League>(
-                League(
-                        id = "4328",
-                        leagueName = "English Premier League"
-                ),
-                League(
-                        id = "4329",
-                        leagueName = "English League Championship"
-                )
-        )
+
 //        `when`(mainPresenter.getLeagueList())
 //                .then {
 //                    mainActivityRule.activity.runOnUiThread {
@@ -173,41 +208,51 @@ class MainActivityTest {
 //                }
 
 
+//        doAnswer{
+//            mainActivityRule.activity.runOnUiThread {
+//                //EspressoIdlingResource.mCountingIdlingResource.increment()
+//                val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+//                matchesFragment.showLeagueList(leagues)
+//                //EspressoIdlingResource.mCountingIdlingResource.decrement()
+//            }
+//            return@doAnswer null
+//        }.`when`(mainPresenter).getLeagueList()
+//
+//        doAnswer {
+//            mainActivityRule.activity.runOnUiThread {
+//                //EspressoIdlingResource.mCountingIdlingResource.increment()
+//                val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+//                matchesFragment.showEventList(events)
+//                //EspressoIdlingResource.mCountingIdlingResource.decrement()
+//            }
+//        }.`when`(mainPresenter).get15EventsByLeagueId(
+//                ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean())
+
 
         //val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
         //IdlingRegistry.getInstance().register(matchesFragment.getIdlingResourceInTest())
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.mCountingIdlingResource)
+        //IdlingRegistry.getInstance().register(EspressoIdlingResource.mCountingIdlingResource)
 
-        mainActivityRule.activity.runOnUiThread {
-            EspressoIdlingResource.mCountingIdlingResource.increment()
-            val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-            matchesFragment.showLeagueList(leagues)
-            EspressoIdlingResource.mCountingIdlingResource.decrement()
-        }
 
-        mainActivityRule.activity.runOnUiThread {
-            EspressoIdlingResource.mCountingIdlingResource.increment()
-            val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-            matchesFragment.showEventList(events)
-            EspressoIdlingResource.mCountingIdlingResource.decrement()
-        }
+//        onView(withId(R.id.list_event))
+//                .check(matches(isDisplayed()))
+//        verify(mainPresenter, times(1)).getLeagueList()
+//        verify(mainPresenter, times(1)).get15EventsByLeagueId(ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean())
+//        events.forEach {
+//            onView(withText(it.homeTeamName)).check(matches(isDisplayed()))
+//            onView(withText(it.awayTeamName)).check(matches(isDisplayed()))
+//        }
+//        onView(withId(R.id.list_event)).perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(1))
+//        onView(withId(R.id.list_event)).perform(
+//                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(1, click()))
+//
+//        intended(hasComponent(DetailActivity::class.java.name))
 
-        onView(withId(R.id.list_event))
-                .check(matches(isDisplayed()))
-        verify(mainPresenter, times(1)).getLeagueList()
-        events.forEach {
-            onView(withText(it.homeTeamName)).check(matches(isDisplayed()))
-            onView(withText(it.awayTeamName)).check(matches(isDisplayed()))
-        }
-        onView(withId(R.id.list_event)).perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(1))
-        onView(withId(R.id.list_event)).perform(
-                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(1, click()))
-
-        detailActivityRule.activity.runOnUiThread {
-            EspressoIdlingResource.mCountingIdlingResource.increment()
-            detailActivityRule.activity.showEventDetail(events[1])
-            EspressoIdlingResource.mCountingIdlingResource.decrement()
-        }
+//        detailActivityRule.activity.runOnUiThread {
+//            EspressoIdlingResource.mCountingIdlingResource.increment()
+//            detailActivityRule.activity.showEventDetail(events[1])
+//            EspressoIdlingResource.mCountingIdlingResource.decrement()
+//        }
 //
 //        //detailActivityRule.
 //        //IdlingRegistry.getInstance().register(detailActivityRule.activity.getIdlingResourceInTest())
@@ -219,6 +264,52 @@ class MainActivityTest {
 //        onView(withText("Event is still loading"))
 //                .check(matches(isDisplayed()))
 //        pressBack()
+    }
+
+    @Test
+    fun subscribe_to_presenter_and_load_league(){
+        verify(mainPresenter).getLeagueList()
+
+    }
+
+    @Test
+    fun select_dropdown_and_load_last_15_event(){
+
+        `when`(mainPresenter.get15EventsByLeagueId(
+            ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean()))
+            .then {
+                mainActivityRule.activity.runOnUiThread {
+                    EspressoIdlingResource.mCountingIdlingResource.increment()
+                    val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+                    matchesFragment.showEventList(events)
+                    EspressoIdlingResource.mCountingIdlingResource.decrement()
+                }
+            }
+
+        mainActivityRule.activity.runOnUiThread {
+            //EspressoIdlingResource.mCountingIdlingResource.increment()
+            val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+            matchesFragment.showLeagueList(leagues)
+            //EspressoIdlingResource.mCountingIdlingResource.decrement()
+        }
+
+        val selectionText = leagues[1].leagueName
+        onView(withId(R.id.spinner_league)).check(matches(isDisplayed()))
+        verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[0].id, true)
+        onView(withId(R.id.list_event)).check(matches(isDisplayed()))
+        onView(withId(R.id.spinner_league)).perform(click())
+        //`is`(instanceOf(League::class.java))
+        //onData(allOf(`is`(instanceOf(League::class.java)), `is`(leagues[1].toString())))
+        onData(`is`(instanceOf(League::class.java)))
+                .atPosition(1)
+                .perform(click())
+        //SystemClock.sleep(5000)
+        onView(withId(R.id.spinner_league)).check(matches(withSpinnerText(containsString(selectionText))))
+
+        verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[1].id, true)
+//        onData(allOf(is(instanceOf(String::class.java), is(selectionText))))
+//            .
+        //verify(mainPresenter).get15EventsByLeagueId(ArgumentMatchers.anyString(), ArgumentMatchers.booleanThat { false })
     }
 
 //    @Test

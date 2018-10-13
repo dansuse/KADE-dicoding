@@ -110,7 +110,9 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
             orientation = LinearLayout.VERTICAL
             topPadding = dip(16)
 
-            spinner = spinner ().lparams{
+            spinner = spinner {
+                id = R.id.spinner_league
+            }.lparams{
                 leftPadding = dip(16)
                 rightPadding = dip(16)
             }
