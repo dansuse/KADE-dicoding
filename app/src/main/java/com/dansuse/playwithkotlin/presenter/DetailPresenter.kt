@@ -6,6 +6,7 @@ import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.TeamResponse
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
 import com.dansuse.playwithkotlin.view.DetailView
+import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -13,8 +14,10 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 
 open class DetailPresenter (
-    private val view: DetailView,
-    private val theSportDBApiService: TheSportDBApiService
+        private val view: DetailView,
+        private val theSportDBApiService: TheSportDBApiService,
+        private val processScheduler: Scheduler,
+        private val androidScheduler: Scheduler
     ){
 
   var disposable: Disposable?=null
@@ -25,12 +28,12 @@ open class DetailPresenter (
     view.showLoading()
     disposable = theSportDBApiService.getEventDetail(eventId.toInt())
         .map{ eventResponse -> eventResponse.events[0] }
-        .observeOn(AndroidSchedulers.mainThread())
+        .observeOn(androidScheduler)
         .doOnNext{
           event -> view.hideLoading()
           view.showEventDetail(event)
         }
-        .observeOn(Schedulers.io())
+        .observeOn(processScheduler)
         .flatMap { event -> Single.zip(
             theSportDBApiService.getTeamDetail(event.homeTeamId.toInt()),
             theSportDBApiService.getTeamDetail(event.awayTeamId.toInt())
@@ -40,8 +43,8 @@ open class DetailPresenter (
           return@BiFunction event
         }
         ).toObservable()
-        }.subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
+        }.subscribeOn(processScheduler)
+        .observeOn(androidScheduler)
         .subscribe(
             {result -> view.hideLoading()
               view.showEventDetail(result)

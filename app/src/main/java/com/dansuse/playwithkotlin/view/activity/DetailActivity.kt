@@ -24,6 +24,8 @@ import com.dansuse.playwithkotlin.repository.TheSportDBApiService
 import com.dansuse.playwithkotlin.view.DetailView
 import com.dansuse.playwithkotlin.visible
 import com.squareup.picasso.Picasso
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.*
 import org.jetbrains.anko.db.classParser
 import org.jetbrains.anko.db.delete
@@ -174,7 +176,7 @@ class DetailActivity : AppCompatActivity(), DetailView {
     if(this::presenter.isInitialized){
       return
     }
-    presenter = DetailPresenter(this, TheSportDBApiService.create())
+    presenter = DetailPresenter(this, TheSportDBApiService.create(), Schedulers.io(), AndroidSchedulers.mainThread())
   }
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
