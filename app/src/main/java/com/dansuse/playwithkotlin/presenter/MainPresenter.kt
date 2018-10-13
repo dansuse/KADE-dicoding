@@ -20,18 +20,18 @@ open class MainPresenter (
     private val androidScheduler: Scheduler){
 
   open fun getLeagueList(){
-      EspressoIdlingResource.mCountingIdlingResource.increment()
+      //EspressoIdlingResource.mCountingIdlingResource.increment()
     leagueDisposable = theSportDBApiService.getAllLeagues()
         .subscribeOn(processScheduler)
         .observeOn(androidScheduler)
         .subscribe({
           leagueResponse -> view.hideLoading()
           view.showLeagueList(leagueResponse.leagues)
-            EspressoIdlingResource.mCountingIdlingResource.decrement()
+            //EspressoIdlingResource.mCountingIdlingResource.decrement()
         },
         {error ->
           view.showErrorMessage(error.message ?: "Terjadi kesalahan saat mencoba mengambil data")
-            EspressoIdlingResource.mCountingIdlingResource.decrement()
+            //EspressoIdlingResource.mCountingIdlingResource.decrement()
         }
         )
   }
@@ -41,7 +41,7 @@ open class MainPresenter (
 
   open fun get15EventsByLeagueId(leagueId:String, isPrevMatchMode:Boolean){
     if(leagueId != ""){
-        EspressoIdlingResource.mCountingIdlingResource.increment()
+        //EspressoIdlingResource.mCountingIdlingResource.increment()
       view.showLoading()
       eventDisposable = theSportDBApiService.get15EventsByLeagueId(
           if(isPrevMatchMode) TheSportDBApiService.MODE_PAST_15_EVENTS
@@ -73,11 +73,11 @@ open class MainPresenter (
           .subscribe(
               {result -> view.hideLoading()
                 view.showEventList(result)
-                  EspressoIdlingResource.mCountingIdlingResource.decrement()
+                  //EspressoIdlingResource.mCountingIdlingResource.decrement()
               },
               {error -> view.hideLoading()
                 view.showErrorMessage(error.localizedMessage)
-                  EspressoIdlingResource.mCountingIdlingResource.decrement()
+                  //EspressoIdlingResource.mCountingIdlingResource.decrement()
               }
           )
     }

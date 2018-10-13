@@ -51,4 +51,6 @@
 
     <item name="list_event" type="id"/>
     <item name="spinner_league" type="id"/>
+    <item name="list_favorite_event" type="id"/>
+    <item name="swipe_refresh_favorite_event" type="id"/>
 </resources>

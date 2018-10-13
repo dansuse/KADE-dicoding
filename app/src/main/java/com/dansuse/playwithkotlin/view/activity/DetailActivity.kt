@@ -13,6 +13,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import com.dansuse.playwithkotlin.EspressoIdlingResource
 import com.dansuse.playwithkotlin.R
 import com.dansuse.playwithkotlin.database.database
 import com.dansuse.playwithkotlin.invisible
@@ -133,7 +134,7 @@ class DetailActivity : AppCompatActivity(), DetailView {
   private var event:Event? = null
   private lateinit var eventId:String
 
-  private val idlingRes : CountingIdlingResource = CountingIdlingResource("DetailActivity")
+
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -173,7 +174,7 @@ class DetailActivity : AppCompatActivity(), DetailView {
     if(this::presenter.isInitialized){
       return
     }
-    presenter = DetailPresenter(this, TheSportDBApiService.create(), idlingRes)
+    presenter = DetailPresenter(this, TheSportDBApiService.create())
   }
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -208,6 +209,7 @@ class DetailActivity : AppCompatActivity(), DetailView {
   }
 
   private fun favoriteState(){
+    EspressoIdlingResource.mCountingIdlingResource.increment()
     database.use {
       val result = select(Favorite.TABLE_FAVORITE)
               .whereArgs("(${Favorite.EVENT_ID} = {id})",
@@ -215,9 +217,11 @@ class DetailActivity : AppCompatActivity(), DetailView {
       val favorite = result.parseList(classParser<Favorite>())
       if (!favorite.isEmpty()) isFavorite = true
     }
+    EspressoIdlingResource.mCountingIdlingResource.decrement()
   }
 
   private fun addToFavorite(){
+    EspressoIdlingResource.mCountingIdlingResource.increment()
     if(event != null){
       try {
         database.use {
@@ -236,13 +240,17 @@ class DetailActivity : AppCompatActivity(), DetailView {
         frameLayout.snackbar(getString(R.string.event_added_to_favorites)).show()
       } catch (e: SQLiteConstraintException){
         frameLayout.snackbar(e.localizedMessage).show()
+      } finally {
+
       }
     }else{
       frameLayout.snackbar(getString(R.string.event_is_still_loading)).show()
     }
+    EspressoIdlingResource.mCountingIdlingResource.decrement()
   }
 
   private fun removeFromFavorite(){
+    EspressoIdlingResource.mCountingIdlingResource.increment()
     try {
       database.use {
         delete(Favorite.TABLE_FAVORITE, "(${Favorite.EVENT_ID} = {id})",
@@ -253,6 +261,7 @@ class DetailActivity : AppCompatActivity(), DetailView {
     } catch (e: SQLiteConstraintException){
       frameLayout.snackbar(e.localizedMessage).show()
     }
+    EspressoIdlingResource.mCountingIdlingResource.decrement()
   }
 
   override fun onDestroy() {
@@ -329,10 +338,6 @@ class DetailActivity : AppCompatActivity(), DetailView {
     val date: Date = inputFormat.parse(event.date)
     val outputFormat = SimpleDateFormat("E, dd MMM yyyy")
     matchDate.text = outputFormat.format(date)
-  }
-
-  fun getIdlingResourceInTest():CountingIdlingResource{
-    return idlingRes
   }
 
 }

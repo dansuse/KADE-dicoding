@@ -14,14 +14,14 @@ import io.reactivex.schedulers.Schedulers
 
 open class DetailPresenter (
     private val view: DetailView,
-    private val theSportDBApiService: TheSportDBApiService,
-    private val idlingRes:CountingIdlingResource){
+    private val theSportDBApiService: TheSportDBApiService
+    ){
 
   var disposable: Disposable?=null
 
   open fun getEventDetailById(eventId:String){
-      EspressoIdlingResource.mCountingIdlingResource.increment()
-      idlingRes.increment()
+      //EspressoIdlingResource.mCountingIdlingResource.increment()
+
     view.showLoading()
     disposable = theSportDBApiService.getEventDetail(eventId.toInt())
         .map{ eventResponse -> eventResponse.events[0] }
@@ -45,13 +45,13 @@ open class DetailPresenter (
         .subscribe(
             {result -> view.hideLoading()
               view.showEventDetail(result)
-                idlingRes.decrement()
-                EspressoIdlingResource.mCountingIdlingResource.decrement()
+
+                //EspressoIdlingResource.mCountingIdlingResource.decrement()
             },
             {error -> view.hideLoading()
               view.showErrorMessage(error.localizedMessage)
-                idlingRes.decrement()
-                EspressoIdlingResource.mCountingIdlingResource.decrement()
+
+                //EspressoIdlingResource.mCountingIdlingResource.decrement()
             }
         )
 

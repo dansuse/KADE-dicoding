@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.dansuse.playwithkotlin.EspressoIdlingResource
 import com.dansuse.playwithkotlin.R
 import com.dansuse.playwithkotlin.database.database
 import com.dansuse.playwithkotlin.model.Favorite
@@ -51,19 +52,21 @@ class FavoriteMatchesFragment : Fragment(), AnkoComponent<Context> {
 
     override fun createView(ui: AnkoContext<Context>): View = with(ui){
         linearLayout {
-            lparams (width = matchParent, height = wrapContent)
+            lparams (width = matchParent, height = matchParent)
             topPadding = dip(16)
             leftPadding = dip(16)
             rightPadding = dip(16)
 
             swipeRefresh = swipeRefreshLayout {
+                id = R.id.swipe_refresh_favorite_event
                 setColorSchemeResources(R.color.colorAccent,
                         android.R.color.holo_green_light,
                         android.R.color.holo_orange_light,
                         android.R.color.holo_red_light)
 
                 listEvent = recyclerView {
-                    lparams (width = matchParent, height = wrapContent)
+                    id = R.id.list_favorite_event
+                    lparams (width = matchParent, height = matchParent)
                     layoutManager = LinearLayoutManager(ctx)
                 }
             }
@@ -71,6 +74,7 @@ class FavoriteMatchesFragment : Fragment(), AnkoComponent<Context> {
     }
 
     private fun showFavorite(){
+        EspressoIdlingResource.mCountingIdlingResource.increment()
         context?.database?.use {
             swipeRefresh.isRefreshing = false
             val result = select(Favorite.TABLE_FAVORITE)
@@ -78,5 +82,6 @@ class FavoriteMatchesFragment : Fragment(), AnkoComponent<Context> {
             favorites.addAll(favorite)
             adapter.notifyDataSetChanged()
         }
+        EspressoIdlingResource.mCountingIdlingResource.decrement()
     }
 }
