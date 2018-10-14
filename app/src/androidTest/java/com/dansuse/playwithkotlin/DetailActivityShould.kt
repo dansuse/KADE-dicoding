@@ -1,29 +1,23 @@
 package com.dansuse.playwithkotlin
 
 import android.content.Intent
-import android.os.SystemClock
 import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.Espresso
-import android.support.test.espresso.action.ViewActions
-import android.support.test.espresso.matcher.ViewMatchers
+import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.assertion.ViewAssertions.matches
+import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.presenter.DetailPresenter
 import com.dansuse.playwithkotlin.view.activity.DetailActivity
-import com.dansuse.playwithkotlin.view.fragment.MatchesFragment
+import org.hamcrest.Matchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
-import kotlin.concurrent.timer
-import android.support.test.espresso.Espresso.*
-import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.espresso.action.ViewActions.*
-import android.support.test.espresso.assertion.ViewAssertions.*
-import org.hamcrest.Matchers
 
 @RunWith(AndroidJUnit4::class)
 class DetailActivityShould{

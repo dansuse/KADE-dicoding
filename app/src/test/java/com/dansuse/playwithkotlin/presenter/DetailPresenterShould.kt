@@ -1,35 +1,19 @@
 package com.dansuse.playwithkotlin.presenter
 
-import android.accounts.NetworkErrorException
-import com.dansuse.playwithkotlin.model.*
+import com.dansuse.playwithkotlin.model.Event
+import com.dansuse.playwithkotlin.model.EventResponse
+import com.dansuse.playwithkotlin.model.Team
+import com.dansuse.playwithkotlin.model.TeamResponse
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
 import com.dansuse.playwithkotlin.view.DetailView
-import com.dansuse.playwithkotlin.view.MainView
 import io.reactivex.Observable
-import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.observers.TestObserver
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.schedulers.TestScheduler
-import okhttp3.OkHttpClient
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
-
-import org.junit.Assert.*
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.MockResponse
-import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.*
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
-import java.io.File
-import java.lang.RuntimeException
-import java.util.concurrent.TimeUnit
+import org.mockito.MockitoAnnotations
 
 class DetailPresenterShould{
 
@@ -74,8 +58,6 @@ class DetailPresenterShould{
             teamBadge = "https://www.thesportsdb.com/images/media/team/badge/vrtrtp1448813175.png"
     )
 
-    //ToDo belum di test apabila terjadi error untuk stream
-
     @Mock
     private
     lateinit var view: DetailView
@@ -96,8 +78,6 @@ class DetailPresenterShould{
 
     @Test
     fun send_result_when_get_event_detail_by_id_success() {
-        //val eventId = "432867"
-
         val eventResponse = EventResponse(listOf(event))
         val homeTeamResponse = TeamResponse(listOf(homeTeam))
         val awayTeamResponse = TeamResponse(listOf(awayTeam))

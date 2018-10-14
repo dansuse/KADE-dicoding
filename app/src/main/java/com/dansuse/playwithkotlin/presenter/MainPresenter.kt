@@ -1,17 +1,13 @@
 package com.dansuse.playwithkotlin.presenter
 
-import android.support.test.espresso.idling.CountingIdlingResource
-import com.dansuse.playwithkotlin.EspressoIdlingResource
 import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.TeamResponse
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
 import com.dansuse.playwithkotlin.view.MainView
 import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
-import io.reactivex.schedulers.Schedulers
 
 open class MainPresenter (
     private val view: MainView,

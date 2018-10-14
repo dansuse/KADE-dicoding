@@ -5,29 +5,15 @@ import com.dansuse.playwithkotlin.model.*
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
 import com.dansuse.playwithkotlin.view.MainView
 import io.reactivex.Observable
-import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.observers.TestObserver
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.schedulers.TestScheduler
-import okhttp3.OkHttpClient
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-
-import org.junit.Assert.*
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.MockResponse
 import org.mockito.ArgumentMatchers
+import org.mockito.Mock
 import org.mockito.Mockito.*
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
-import java.io.File
-import java.util.concurrent.TimeUnit
+import org.mockito.MockitoAnnotations
 
 class MainPresenterShould {
 
@@ -41,66 +27,23 @@ class MainPresenterShould {
     private
     lateinit var theSportDBApiService: TheSportDBApiService
 
-//    lateinit var mockServer : MockWebServer
     lateinit var mainPresenter: MainPresenter
     lateinit var testScheduler: TestScheduler
 
     @Before
     fun setUp() {
-        //RxAndroidPlugins.setInitMainThreadSchedulerHandler({ Schedulers.trampoline()})
         MockitoAnnotations.initMocks(this)
-//        mockServer = MockWebServer()
-//        mockServer.start()
-//
-//        // Get an okhttp client
-//        val okHttpClient = OkHttpClient.Builder()
-//                .build()
-//
-//        // Get an instance of Retrofit
-//        val retrofit = Retrofit.Builder()
-//                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-//                .baseUrl("https://api.blogs.com")
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .client(okHttpClient)
-//                .build()
-//
-//        // Get an instance of blogService
-//        theSportDBApiService = retrofit.create(TheSportDBApiService::class.java)
+
         testScheduler = TestScheduler()
         mainPresenter = MainPresenter(view, theSportDBApiService, testScheduler, testScheduler)
     }
 
     @After
     fun tearDown() {
-//        mockServer.shutdown()
     }
 
     @Test
     fun send_result_when_get_leagues_success() {
-//        val testObserver = TestObserver<LeagueResponse>()
-//
-//        val path = "/blogs"
-//
-//        // Mock a response with status 200 and sample JSON output
-//        val mockResponse = MockResponse()
-//                .setResponseCode(200)
-//                .setBody(getJson("json/blog/blogs.json"))
-//        // Enqueue request
-//        mockServer.enqueue(mockResponse)
-//
-//        // Call the API
-//        theSportDBApiService.getAllLeagues().subscribe(testObserver)
-//        testObserver.awaitTerminalEvent(2, TimeUnit.SECONDS)
-//
-//        // No errors
-//        testObserver.assertNoErrors()
-//        // One list emitted
-//        testObserver.assertValueCount(1)
-//
-//        // Get the request that was just made
-//        val request = mockServer.takeRequest()
-//        // Make sure we made the request to the required path
-//        assertEquals(path, request.path)
 
         val leagueResponse = LeagueResponse(listOf(
             League(
@@ -138,7 +81,6 @@ class MainPresenterShould {
 
         val eventResponse:EventResponse = EventResponse(ArrayList<Event>())
         val teamResponse:TeamResponse = TeamResponse(ArrayList<Team>())
-        //val awayTeamResponse:TeamResponse = TeamResponse(ArrayList<Team>())
 
         `when`(theSportDBApiService.get15EventsByLeagueId(
                 mode, leagueId.toInt())).thenReturn(Observable.just(eventResponse))

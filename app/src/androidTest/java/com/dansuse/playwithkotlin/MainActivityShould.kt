@@ -1,17 +1,18 @@
 package com.dansuse.playwithkotlin
 
 import android.content.Intent
-import android.os.SystemClock
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso.*
 import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.action.ViewActions.swipeDown
+import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.intent.Intents
 import android.support.test.espresso.intent.Intents.intended
 import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import android.support.test.espresso.intent.rule.IntentsTestRule
+import android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
@@ -20,27 +21,17 @@ import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.League
 import com.dansuse.playwithkotlin.presenter.DetailPresenter
 import com.dansuse.playwithkotlin.presenter.MainPresenter
-import com.dansuse.playwithkotlin.view.DetailView
-import com.dansuse.playwithkotlin.view.MainView
 import com.dansuse.playwithkotlin.view.activity.DetailActivity
 import com.dansuse.playwithkotlin.view.activity.MainActivity
 import com.dansuse.playwithkotlin.view.fragment.MatchesFragment
-import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.mockito.ArgumentMatchers
+import org.mockito.Mockito
 import org.mockito.Mockito.*
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
-import android.support.test.espresso.Espresso.onData
-import android.support.test.espresso.action.ViewActions.swipeDown
-import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
-import android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra
 
 
 @RunWith(AndroidJUnit4::class)
@@ -121,47 +112,14 @@ class MainActivityShould {
 
     @Rule
     @JvmField var mainActivityRule = object : ActivityTestRule<MainActivity>(MainActivity::class.java){
-//        override fun afterActivityLaunched() {
-//            //super.afterActivityLaunched()
-//            val matchesFragment = this.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-//            MatchesFragment.presenter = presenter
-//        }
         override fun beforeActivityLaunched() {
-//            doAnswer{
-//                this.activity.runOnUiThread {
-//                    //EspressoIdlingResource.mCountingIdlingResource.increment()
-//                    val matchesFragment:MatchesFragment = this.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-//                    matchesFragment.showLeagueList(leagues)
-//                    //EspressoIdlingResource.mCountingIdlingResource.decrement()
-//                }
-//                return@doAnswer null
-//            }.`when`(mainPresenter).getLeagueList()
-//
-//            doAnswer {
-//                this.activity.runOnUiThread {
-//                    //EspressoIdlingResource.mCountingIdlingResource.increment()
-//                    val matchesFragment:MatchesFragment = this.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-//                    matchesFragment.showEventList(events)
-//                    //EspressoIdlingResource.mCountingIdlingResource.decrement()
-//                }
-//            }.`when`(mainPresenter).get15EventsByLeagueId(
-//                    ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean())
-
             MatchesFragment.presenter = mainPresenter
-
         }
     }
 
     @Rule
     @JvmField var detailActivityRule =
             object : ActivityTestRule<DetailActivity>(DetailActivity::class.java, true, false){
-//                override fun getActivityIntent(): Intent {
-//                    val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
-//                    return Intent(targetContext, DetailActivity::class.java).apply {
-//                        putExtra("event", "576548")
-//                    }
-//                }
-
                 override fun beforeActivityLaunched() {
                     DetailActivity.presenter = detailPresenter
                 }
@@ -197,81 +155,18 @@ class MainActivityShould {
         verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[0].id, true)
         onView(withId(R.id.list_event)).check(matches(isDisplayed()))
         onView(withId(R.id.spinner_league)).perform(click())
-        //onData(allOf(`is`(instanceOf(League::class.java)), `is`(leagues[1].toString())))
+
         onData(`is`(instanceOf(League::class.java)))
                 .atPosition(1)
                 .perform(click())
-        //SystemClock.sleep(5000)
+
         onView(withId(R.id.spinner_league)).check(matches(withSpinnerText(containsString(selectionText))))
 
         verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[1].id, true)
-//        onData(allOf(is(instanceOf(String::class.java), is(selectionText))))
-//            .
-        //verify(mainPresenter).get15EventsByLeagueId(ArgumentMatchers.anyString(), ArgumentMatchers.booleanThat { false })
     }
 
     @Test
     fun open_event_detail_when_click_event_list_item() {
-
-//        `when`(mainPresenter.getLeagueList())
-//                .then {
-//                    mainActivityRule.activity.runOnUiThread {
-//                        EspressoIdlingResource.mCountingIdlingResource.increment()
-//                        val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-//                        matchesFragment.showLeagueList(leagues)
-//                        EspressoIdlingResource.mCountingIdlingResource.decrement()
-//                    }
-//                }
-//
-//
-//
-//        `when`(mainPresenter.get15EventsByLeagueId(
-//                ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean()))
-//                .then {
-//                    mainActivityRule.activity.runOnUiThread {
-//                        EspressoIdlingResource.mCountingIdlingResource.increment()
-//                        val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-//                        matchesFragment.showEventList(events)
-//                        EspressoIdlingResource.mCountingIdlingResource.decrement()
-//                    }
-//                }
-//
-//        `when`(detailPresenter.getEventDetailById(
-//                ArgumentMatchers.anyString()))
-//                .then {
-//                    detailActivityRule.activity.runOnUiThread {
-//                        EspressoIdlingResource.mCountingIdlingResource.increment()
-//                        detailActivityRule.activity.showEventDetail(events[1])
-//                        EspressoIdlingResource.mCountingIdlingResource.decrement()
-//                    }
-//                }
-
-
-//        doAnswer{
-//            mainActivityRule.activity.runOnUiThread {
-//                //EspressoIdlingResource.mCountingIdlingResource.increment()
-//                val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-//                matchesFragment.showLeagueList(leagues)
-//                //EspressoIdlingResource.mCountingIdlingResource.decrement()
-//            }
-//            return@doAnswer null
-//        }.`when`(mainPresenter).getLeagueList()
-//
-//        doAnswer {
-//            mainActivityRule.activity.runOnUiThread {
-//                //EspressoIdlingResource.mCountingIdlingResource.increment()
-//                val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-//                matchesFragment.showEventList(events)
-//                //EspressoIdlingResource.mCountingIdlingResource.decrement()
-//            }
-//        }.`when`(mainPresenter).get15EventsByLeagueId(
-//                ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean())
-
-
-        //val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-        //IdlingRegistry.getInstance().register(matchesFragment.getIdlingResourceInTest())
-        //IdlingRegistry.getInstance().register(EspressoIdlingResource.mCountingIdlingResource)
-
         Intents.init()
         mainActivityRule.activity.runOnUiThread {
             val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
@@ -280,7 +175,6 @@ class MainActivityShould {
         onView(withId(R.id.list_event))
                 .check(matches(isDisplayed()))
 
-//        verify(mainPresenter, times(1)).get15EventsByLeagueId(ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean())
         events.forEach {
             onView(withText(it.homeTeamName)).check(matches(isDisplayed()))
             onView(withText(it.awayTeamName)).check(matches(isDisplayed()))
@@ -292,22 +186,6 @@ class MainActivityShould {
         intended(allOf(hasComponent(DetailActivity::class.java.name), hasExtra("event", events[1].id)))
 
         Intents.release()
-//        detailActivityRule.activity.runOnUiThread {
-//            EspressoIdlingResource.mCountingIdlingResource.increment()
-//            detailActivityRule.activity.showEventDetail(events[1])
-//            EspressoIdlingResource.mCountingIdlingResource.decrement()
-//        }
-//
-//        //detailActivityRule.
-//        //IdlingRegistry.getInstance().register(detailActivityRule.activity.getIdlingResourceInTest())
-//        onView(withId(R.id.add_to_favorite))
-//                .check(matches(isDisplayed()))
-//        onView(withId(R.id.add_to_favorite)).perform(click())
-//        onView(withText("Added to favorite"))
-//                .check(matches(isDisplayed()))
-//        onView(withText("Event is still loading"))
-//                .check(matches(isDisplayed()))
-//        pressBack()
     }
 
     @Test
@@ -325,14 +203,6 @@ class MainActivityShould {
     fun add_event_to_favorite_or_remove_event_from_favorite_when_menu_item_favorite_click(){
         IdlingRegistry.getInstance().register(EspressoIdlingResource.mCountingIdlingResource)
         InstrumentationRegistry.getTargetContext().deleteDatabase("FavoriteEvent.db")
-//        mainActivityRule.activity.runOnUiThread {
-//            val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-//            matchesFragment.showLeagueList(leagues)
-//        }
-//        mainActivityRule.activity.runOnUiThread {
-//            val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-//            matchesFragment.showEventList(events)
-//        }
 
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
         val intent:Intent = Intent(targetContext, DetailActivity::class.java).apply {
@@ -405,29 +275,5 @@ class MainActivityShould {
         intended(allOf(hasComponent(DetailActivity::class.java.name), hasExtra("event", events[1].id)))
         Intents.release()
     }
-
-//    @Test
-//    fun testRecyclerViewBehaviour() {
-//        //val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-//        //IdlingRegistry.getInstance().register(matchesFragment.getIdlingResourceInTest())
-//        IdlingRegistry.getInstance().register(EspressoIdlingResource.mCountingIdlingResource)
-//
-//        onView(withId(R.id.list_event))
-//                .check(matches(isDisplayed()))
-//        onView(withId(R.id.list_event)).perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(10))
-//        onView(withId(R.id.list_event)).perform(
-//                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(10, click()))
-//
-//        //detailActivityRule.
-//        //IdlingRegistry.getInstance().register(detailActivityRule.activity.getIdlingResourceInTest())
-//        onView(withId(R.id.add_to_favorite))
-//                .check(matches(isDisplayed()))
-//        onView(withId(R.id.add_to_favorite)).perform(click())
-////        onView(withText("Added to favorite"))
-////                .check(matches(isDisplayed()))
-////        onView(withText("Event is still loading"))
-////                .check(matches(isDisplayed()))
-//        pressBack()
-//    }
 
 }

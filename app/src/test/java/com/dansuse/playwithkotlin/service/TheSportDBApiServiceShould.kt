@@ -4,14 +4,13 @@ import com.dansuse.playwithkotlin.BuildConfig
 import com.dansuse.playwithkotlin.model.*
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
 import io.reactivex.observers.TestObserver
-import junit.framework.Assert.assertEquals
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
