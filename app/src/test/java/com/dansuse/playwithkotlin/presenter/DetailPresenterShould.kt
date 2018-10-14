@@ -28,9 +28,10 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import java.lang.RuntimeException
 import java.util.concurrent.TimeUnit
 
-class DetailPresenterTest{
+class DetailPresenterShould{
 
     private val event:Event = Event(
             id = "576548",
@@ -94,23 +95,55 @@ class DetailPresenterTest{
     }
 
     @Test
-    fun getEventDetailById() {
-        val eventId = "432867"
+    fun send_result_when_get_event_detail_by_id_success() {
+        //val eventId = "432867"
 
-        val eventResponse:EventResponse = EventResponse(listOf(event))
-        val homeTeamResponse:TeamResponse = TeamResponse(listOf(homeTeam))
-        val awayTeamResponse:TeamResponse = TeamResponse(listOf(awayTeam))
+        val eventResponse = EventResponse(listOf(event))
+        val homeTeamResponse = TeamResponse(listOf(homeTeam))
+        val awayTeamResponse = TeamResponse(listOf(awayTeam))
 
-        `when`(theSportDBApiService.getEventDetail(eventId.toInt())).thenReturn(Observable.just(eventResponse))
+        `when`(theSportDBApiService.getEventDetail(event.id!!.toInt())).thenReturn(Observable.just(eventResponse))
         `when`(theSportDBApiService.getTeamDetail(event.homeTeamId.toInt()))
                 .thenReturn(Single.just(homeTeamResponse))
         `when`(theSportDBApiService.getTeamDetail(event.awayTeamId.toInt()))
                 .thenReturn(Single.just(awayTeamResponse))
-        detailPresenter.getEventDetailById(eventId)
+        detailPresenter.getEventDetailById(event.id!!)
         testScheduler.triggerActions()
         verify(view).showLoading()
         verify(view, times(2)).hideLoading()
         verify(view, times(2)).showEventDetail(eventResponse.events[0])
+    }
 
+    @Test
+    fun send_error_when_get_event_detail_failed(){
+        val errorMessage = "Terjadi network error"
+        `when`(theSportDBApiService.getEventDetail(event.id!!.toInt())).thenReturn(
+                Observable.error(Throwable(errorMessage))
+        )
+
+        detailPresenter.getEventDetailById(event.id!!)
+        testScheduler.triggerActions()
+        verify(view).showLoading()
+        verify(view).hideLoading()
+        verify(view).showErrorMessage(errorMessage)
+    }
+
+    @Test
+    fun send_error_when_get_team_detail_failed(){
+        val errorMessage = "Terjadi network error"
+        val eventResponse = EventResponse(listOf(event))
+        val homeTeamResponse = TeamResponse(listOf(homeTeam))
+        `when`(theSportDBApiService.getEventDetail(event.id!!.toInt())).thenReturn(Observable.just(eventResponse))
+        `when`(theSportDBApiService.getTeamDetail(event.homeTeamId.toInt()))
+                .thenReturn(Single.just(homeTeamResponse))
+        `when`(theSportDBApiService.getTeamDetail(event.awayTeamId.toInt()))
+                .thenReturn(Single.error(Throwable(errorMessage)))
+
+        detailPresenter.getEventDetailById(event.id!!)
+        testScheduler.triggerActions()
+        verify(view).showLoading()
+        verify(view).showEventDetail(event)
+        verify(view, times(2)).hideLoading()
+        verify(view).showErrorMessage(errorMessage)
     }
 }

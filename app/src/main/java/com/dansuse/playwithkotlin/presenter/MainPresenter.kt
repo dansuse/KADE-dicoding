@@ -76,7 +76,7 @@ open class MainPresenter (
                   //EspressoIdlingResource.mCountingIdlingResource.decrement()
               },
               {error -> view.hideLoading()
-                view.showErrorMessage(error.localizedMessage)
+                view.showErrorMessage(error.message ?: "Terjadi kesalahan saat mencoba mengambil data")
                   //EspressoIdlingResource.mCountingIdlingResource.decrement()
               }
           )

@@ -29,7 +29,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-class MainPresenterTest {
+class MainPresenterShould {
+
+    private val leagueId = "4328"
 
     @Mock
     private
@@ -74,7 +76,7 @@ class MainPresenterTest {
     }
 
     @Test
-    fun getLeagueList() {
+    fun send_result_when_get_leagues_success() {
 //        val testObserver = TestObserver<LeagueResponse>()
 //
 //        val path = "/blogs"
@@ -100,7 +102,7 @@ class MainPresenterTest {
 //        // Make sure we made the request to the required path
 //        assertEquals(path, request.path)
 
-        val leagueResponse: LeagueResponse = LeagueResponse(ArrayList<League>())
+        val leagueResponse: LeagueResponse = LeagueResponse(listOf())
         `when`(theSportDBApiService.getAllLeagues()).thenReturn(Observable.just(leagueResponse))
         mainPresenter.getLeagueList()
         testScheduler.triggerActions()
@@ -109,7 +111,7 @@ class MainPresenterTest {
     }
 
     @Test
-    fun testGetLeagueReturnError(){
+    fun send_error_when_get_leagues_failed(){
         val exception = NetworkErrorException()
         `when`(theSportDBApiService.getAllLeagues()).thenReturn(
                 Observable.error(exception))
@@ -119,8 +121,8 @@ class MainPresenterTest {
     }
 
     @Test
-    fun get15EventsByLeagueId() {
-        val leagueId = "4328"
+    fun send_result_when_get_15_events_by_league_id_success() {
+
         val isPrevMatchMode = true
         val mode = if(isPrevMatchMode)TheSportDBApiService.MODE_PAST_15_EVENTS else
         TheSportDBApiService.MODE_NEXT_15_EVENTS
@@ -141,17 +143,14 @@ class MainPresenterTest {
 
     }
 
-    /**
-     * Helper function which will load JSON from
-     * the path specified
-     *
-     * @param path : Path of JSON file
-     * @return json : JSON from file at given path
-     */
-    fun getJson(path : String) : String {
-        // Load the JSON response
-        val uri = this.javaClass.classLoader?.getResource(path)
-        val file = File(uri?.path)
-        return String(file.readBytes())
+    @Test
+    fun send_error_when_get_15_events_by_league_id_failed(){
+        val exception = NetworkErrorException()
+        `when`(theSportDBApiService.get15EventsByLeagueId(
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyInt()))
+                .thenReturn(Observable.error(exception))
+        mainPresenter.get15EventsByLeagueId(leagueId, true)
+        testScheduler.triggerActions()
+        verify(view).showErrorMessage(exception.message ?: "Terjadi kesalahan saat mencoba mengambil data")
     }
 }

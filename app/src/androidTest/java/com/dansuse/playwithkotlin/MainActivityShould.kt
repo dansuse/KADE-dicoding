@@ -44,12 +44,12 @@ import android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra
 
 
 @RunWith(AndroidJUnit4::class)
-class MainActivityTest {
+class MainActivityShould {
 
     private val mainPresenter = Mockito.mock(MainPresenter::class.java)
     private val detailPresenter = Mockito.mock(DetailPresenter::class.java)
 
-    val events = listOf(
+    private val events = listOf(
             Event(
                     id = "576548",
                     date = "07/10/18",
@@ -107,7 +107,7 @@ class MainActivityTest {
                     homeBadge = "https://www.thesportsdb.com/images/media/team/badge/xwwvyt1448811086.png"
             )
     )
-    val leagues = listOf(
+    private val leagues = listOf(
             League(
                     id = "4328",
                     leagueName = "English Premier League"
@@ -169,12 +169,49 @@ class MainActivityTest {
 
     @Before
     fun setUp(){
-//        InstrumentationRegistry.getTargetContext().deleteDatabase("FavoriteEvent.db")
-        //Intents.init()
     }
 
     @Test
-    fun click_recycler_view_item_open_detail_activity() {
+    fun subscribe_to_main_presenter_and_load_leagues(){
+        verify(mainPresenter, times(1)).getLeagueList()
+    }
+
+    @Test
+    fun load_last_15_matches_when_dropdown_value_changes(){
+        `when`(mainPresenter.get15EventsByLeagueId(
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean()))
+                .then {
+                    mainActivityRule.activity.runOnUiThread {
+                        val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+                        matchesFragment.showEventList(events)
+                    }
+                }
+
+        mainActivityRule.activity.runOnUiThread {
+            val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+            matchesFragment.showLeagueList(leagues)
+        }
+
+        val selectionText = leagues[1].leagueName
+        onView(withId(R.id.spinner_league)).check(matches(isDisplayed()))
+        verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[0].id, true)
+        onView(withId(R.id.list_event)).check(matches(isDisplayed()))
+        onView(withId(R.id.spinner_league)).perform(click())
+        //onData(allOf(`is`(instanceOf(League::class.java)), `is`(leagues[1].toString())))
+        onData(`is`(instanceOf(League::class.java)))
+                .atPosition(1)
+                .perform(click())
+        //SystemClock.sleep(5000)
+        onView(withId(R.id.spinner_league)).check(matches(withSpinnerText(containsString(selectionText))))
+
+        verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[1].id, true)
+//        onData(allOf(is(instanceOf(String::class.java), is(selectionText))))
+//            .
+        //verify(mainPresenter).get15EventsByLeagueId(ArgumentMatchers.anyString(), ArgumentMatchers.booleanThat { false })
+    }
+
+    @Test
+    fun open_event_detail_when_click_event_list_item() {
 
 //        `when`(mainPresenter.getLeagueList())
 //                .then {
@@ -274,7 +311,7 @@ class MainActivityTest {
     }
 
     @Test
-    fun click_next_match_load_next_15_matches(){
+    fun load_next_15_matches_when_click_next_match_bottom_navigation(){
         onView(withId(R.id.action_next_match)).perform(click())
         mainActivityRule.activity.runOnUiThread {
             val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
@@ -285,51 +322,7 @@ class MainActivityTest {
     }
 
     @Test
-    fun subscribe_to_presenter_and_load_league(){
-        verify(mainPresenter, times(1)).getLeagueList()
-    }
-
-    @Test
-    fun select_dropdown_and_load_last_15_matches(){
-        `when`(mainPresenter.get15EventsByLeagueId(
-            ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean()))
-            .then {
-                mainActivityRule.activity.runOnUiThread {
-                    //EspressoIdlingResource.mCountingIdlingResource.increment()
-                    val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-                    matchesFragment.showEventList(events)
-                    //EspressoIdlingResource.mCountingIdlingResource.decrement()
-                }
-            }
-
-        mainActivityRule.activity.runOnUiThread {
-            //EspressoIdlingResource.mCountingIdlingResource.increment()
-            val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-            matchesFragment.showLeagueList(leagues)
-            //EspressoIdlingResource.mCountingIdlingResource.decrement()
-        }
-
-        val selectionText = leagues[1].leagueName
-        onView(withId(R.id.spinner_league)).check(matches(isDisplayed()))
-        verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[0].id, true)
-        onView(withId(R.id.list_event)).check(matches(isDisplayed()))
-        onView(withId(R.id.spinner_league)).perform(click())
-        //`is`(instanceOf(League::class.java))
-        //onData(allOf(`is`(instanceOf(League::class.java)), `is`(leagues[1].toString())))
-        onData(`is`(instanceOf(League::class.java)))
-                .atPosition(1)
-                .perform(click())
-        //SystemClock.sleep(5000)
-        onView(withId(R.id.spinner_league)).check(matches(withSpinnerText(containsString(selectionText))))
-
-        verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[1].id, true)
-//        onData(allOf(is(instanceOf(String::class.java), is(selectionText))))
-//            .
-        //verify(mainPresenter).get15EventsByLeagueId(ArgumentMatchers.anyString(), ArgumentMatchers.booleanThat { false })
-    }
-
-    @Test
-    fun favorite_match_check_if_it_show_in_favorite_list(){
+    fun add_event_to_favorite_or_remove_event_from_favorite_when_menu_item_favorite_click(){
         IdlingRegistry.getInstance().register(EspressoIdlingResource.mCountingIdlingResource)
         InstrumentationRegistry.getTargetContext().deleteDatabase("FavoriteEvent.db")
 //        mainActivityRule.activity.runOnUiThread {
@@ -378,12 +371,12 @@ class MainActivityTest {
         onView((withId(R.id.list_favorite_event))).check(matches(isDisplayed()))
         onView(withText(events[1].homeTeamName)).check(doesNotExist())
         onView(withText(events[1].awayTeamName)).check(doesNotExist())
-        //SystemClock.sleep(5000)
+
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.mCountingIdlingResource)
     }
 
     @Test
-    fun favorite_item_click_open_detail_activity(){
+    fun open_detail_event_when_click_favorite_event_list_item(){
 
         IdlingRegistry.getInstance().register(EspressoIdlingResource.mCountingIdlingResource)
         InstrumentationRegistry.getTargetContext().deleteDatabase("FavoriteEvent.db")
