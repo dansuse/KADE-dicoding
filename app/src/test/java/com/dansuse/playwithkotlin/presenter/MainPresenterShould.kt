@@ -102,7 +102,16 @@ class MainPresenterShould {
 //        // Make sure we made the request to the required path
 //        assertEquals(path, request.path)
 
-        val leagueResponse: LeagueResponse = LeagueResponse(listOf())
+        val leagueResponse = LeagueResponse(listOf(
+            League(
+                    id = "4328",
+                    leagueName = "English Premier League"
+            ),
+            League(
+                    id = "4329",
+                    leagueName = "English League Championship"
+            )
+        ))
         `when`(theSportDBApiService.getAllLeagues()).thenReturn(Observable.just(leagueResponse))
         mainPresenter.getLeagueList()
         testScheduler.triggerActions()
@@ -145,12 +154,12 @@ class MainPresenterShould {
 
     @Test
     fun send_error_when_get_15_events_by_league_id_failed(){
-        val exception = NetworkErrorException()
+        val errorMessage = "Terjadi network error"
         `when`(theSportDBApiService.get15EventsByLeagueId(
                 ArgumentMatchers.anyString(), ArgumentMatchers.anyInt()))
-                .thenReturn(Observable.error(exception))
+                .thenReturn(Observable.error(Throwable(message = errorMessage)))
         mainPresenter.get15EventsByLeagueId(leagueId, true)
         testScheduler.triggerActions()
-        verify(view).showErrorMessage(exception.message ?: "Terjadi kesalahan saat mencoba mengambil data")
+        verify(view, times(2)).showErrorMessage(errorMessage)
     }
 }

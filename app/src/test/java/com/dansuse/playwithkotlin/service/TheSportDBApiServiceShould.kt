@@ -1,9 +1,10 @@
 package com.dansuse.playwithkotlin.service
 
-import com.dansuse.playwithkotlin.model.Event
-import com.dansuse.playwithkotlin.model.League
-import com.dansuse.playwithkotlin.model.Team
+import com.dansuse.playwithkotlin.BuildConfig
+import com.dansuse.playwithkotlin.model.*
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
+import io.reactivex.observers.TestObserver
+import junit.framework.Assert.assertEquals
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -15,6 +16,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 class TheSportDBApiServiceShould{
     private val okHttpClient = OkHttpClient()
@@ -201,17 +203,85 @@ class TheSportDBApiServiceShould{
         Assert.assertEquals(expectedLeagues, actualLeagues)
     }
 
+    @Test()
+    fun throw_http_exception_when_get_events_on_non_200_http_response(){
+        val testObserver = TestObserver<EventResponse>()
+        val leagueId = 4328
+        val path = "/api/v1/json/" + BuildConfig.TSDB_API_KEY + "/" + TheSportDBApiService.MODE_PAST_15_EVENTS + "?id=" + leagueId.toString()
+        val mockResponse = MockResponse()
+                .setResponseCode(403)
+        webServer.enqueue(mockResponse)
 
-//    @Test(expected = HttpException::class)
-//    fun throw_http_exception_when_get_events_on_non_200_http_response(){
-//        val mockResponse = MockResponse()
-//                .setResponseCode(403)
-//        webServer.enqueue(mockResponse)
-//
-//        service.get15EventsByLeagueId(
-//                TheSportDBApiService.MODE_PAST_15_EVENTS, 4328)
-//                .subscribe()
-//    }
+        service.get15EventsByLeagueId(
+                TheSportDBApiService.MODE_PAST_15_EVENTS, leagueId)
+                .subscribe(testObserver)
+        testObserver.awaitTerminalEvent(2, TimeUnit.SECONDS)
+
+        testObserver.assertNoValues()
+        assertEquals(1, testObserver.errorCount())
+
+        val request = webServer.takeRequest()
+        assertEquals(path, request.path)
+    }
+
+    @Test()
+    fun throw_http_exception_when_get_leagues_on_non_200_http_response(){
+        val testObserver = TestObserver<LeagueResponse>()
+        val path = "/api/v1/json/" + BuildConfig.TSDB_API_KEY + "/all_leagues.php"
+        val mockResponse = MockResponse()
+                .setResponseCode(403)
+        webServer.enqueue(mockResponse)
+
+        service.getAllLeagues()
+                .subscribe(testObserver)
+        testObserver.awaitTerminalEvent(2, TimeUnit.SECONDS)
+
+        testObserver.assertNoValues()
+        assertEquals(1, testObserver.errorCount())
+
+        val request = webServer.takeRequest()
+        assertEquals(path, request.path)
+    }
+
+    @Test()
+    fun throw_http_exception_when_get_event_detail_on_non_200_http_response(){
+        val testObserver = TestObserver<EventResponse>()
+        val eventId = 576548
+        val path = "/api/v1/json/" + BuildConfig.TSDB_API_KEY + "/lookupevent.php?id=" + eventId.toString()
+        val mockResponse = MockResponse()
+                .setResponseCode(403)
+        webServer.enqueue(mockResponse)
+
+        service.getEventDetail(eventId)
+                .subscribe(testObserver)
+        testObserver.awaitTerminalEvent(2, TimeUnit.SECONDS)
+
+        testObserver.assertNoValues()
+        assertEquals(1, testObserver.errorCount())
+
+        val request = webServer.takeRequest()
+        assertEquals(path, request.path)
+    }
+
+    @Test()
+    fun throw_http_exception_when_get_team_detail_on_non_200_http_response(){
+        val testObserver = TestObserver<TeamResponse>()
+        val teamId = 133600
+        val path = "/api/v1/json/" + BuildConfig.TSDB_API_KEY + "/lookupteam.php?id=" + teamId.toString()
+        val mockResponse = MockResponse()
+                .setResponseCode(403)
+        webServer.enqueue(mockResponse)
+
+        service.getTeamDetail(teamId)
+                .subscribe(testObserver)
+        testObserver.awaitTerminalEvent(2, TimeUnit.SECONDS)
+
+        testObserver.assertNoValues()
+        assertEquals(1, testObserver.errorCount())
+
+        val request = webServer.takeRequest()
+        assertEquals(path, request.path)
+    }
 
     /**
      * Helper function which will load JSON from
