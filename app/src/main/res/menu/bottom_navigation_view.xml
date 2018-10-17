@@ -2,16 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_prev_match"
+        android:id="@+id/action_matches"
         android:enabled="true"
-        android:icon="@drawable/prev_match_icon"
-        android:title="@string/text_prev_match"
+        android:icon="@drawable/matches_icon"
+        android:title="@string/matches"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_next_match"
+        android:id="@+id/action_teams"
         android:enabled="true"
-        android:icon="@drawable/next_match_icon"
-        android:title="@string/text_next_match"
+        android:icon="@drawable/teams_icon"
+        android:title="@string/teams"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_favorites"

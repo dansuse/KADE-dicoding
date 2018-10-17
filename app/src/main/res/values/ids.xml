@@ -54,5 +54,13 @@
     <item name="list_favorite_event" type="id"/>
     <item name="swipe_refresh_favorite_event" type="id"/>
 
-    <item name="tab_layout" type="id"/>
+    <item name="tab_layout_matches" type="id"/>
+    <item name="view_pager_matches" type="id"/>
+
+    <item name="tab_layout_favorites" type="id"/>
+    <item name="view_pager_favorites" type="id"/>
+
+    <item name="list_team" type="id"/>
+    <item name="team_name" type="id"/>
+    <item name="team_badge" type="id"/>
 </resources>

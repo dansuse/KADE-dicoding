@@ -17,7 +17,7 @@ interface TheSportDBApiService {
   companion object {
     const val MODE_PAST_15_EVENTS = "eventspastleague.php"
     const val MODE_NEXT_15_EVENTS = "eventsnextleague.php"
-    fun create():TheSportDBApiService{
+    fun create(): TheSportDBApiService {
       val retrofit = Retrofit.Builder()
           .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
           .addConverterFactory(GsonConverterFactory.create())
@@ -38,4 +38,9 @@ interface TheSportDBApiService {
 
   @GET("api/v1/json/" + BuildConfig.TSDB_API_KEY + "/all_leagues.php")
   fun getAllLeagues(): Observable<LeagueResponse>
+
+  @GET("api/v1/json/" + BuildConfig.TSDB_API_KEY + "/search_all_teams.php")
+  fun getTeams(@Query("l") league: String): Observable<TeamResponse>
+
+
 }

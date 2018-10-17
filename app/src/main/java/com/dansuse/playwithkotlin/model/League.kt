@@ -7,8 +7,8 @@ data class League(
     var id: String,
     @SerializedName("strLeague")
     var leagueName: String? = null
-){
-    override fun toString(): String {
-        return leagueName?: ""
-    }
+) {
+  override fun toString(): String {
+    return leagueName ?: ""
+  }
 }

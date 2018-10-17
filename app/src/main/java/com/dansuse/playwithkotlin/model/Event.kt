@@ -7,20 +7,20 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class Event(
     @SerializedName("idEvent")
-    var id:String? = null,
+    var id: String? = null,
 
     @SerializedName("strDate")
-    var date:String? = null,
+    var date: String? = null,
 
     @SerializedName("intHomeScore")
-    var homeScore:String? = null,
+    var homeScore: String? = null,
     @SerializedName("intAwayScore")
-    var awayScore:String? = null,
+    var awayScore: String? = null,
 
     @SerializedName("strHomeTeam")
-    var homeTeamName:String? = null,
+    var homeTeamName: String? = null,
     @SerializedName("strAwayTeam")
-    var awayTeamName:String? = null,
+    var awayTeamName: String? = null,
 
     @SerializedName("strHomeFormation")
     var homeFormation: String? = null,
@@ -28,9 +28,9 @@ data class Event(
     var awayFormation: String? = null,
 
     @SerializedName("strHomeGoalDetails")
-    var homeGoalDetails:String? = null,
+    var homeGoalDetails: String? = null,
     @SerializedName("strAwayGoalDetails")
-    var awayGoalDetails:String? = null,
+    var awayGoalDetails: String? = null,
 
     @SerializedName("intHomeShots")
     var homeShots: String? = null,
@@ -43,30 +43,30 @@ data class Event(
     var awayGoalKeeper: String? = null,
 
     @SerializedName("strHomeLineupDefense")
-    var homeLineupDefense:String? = null,
+    var homeLineupDefense: String? = null,
     @SerializedName("strAwayLineupDefense")
-    var awayLineupDefense:String? = null,
+    var awayLineupDefense: String? = null,
 
     @SerializedName("strHomeLineupMidfield")
-    var homeLineupMidfield:String? = null,
+    var homeLineupMidfield: String? = null,
     @SerializedName("strAwayLineupMidfield")
-    var awayLineupMidfield:String? = null,
+    var awayLineupMidfield: String? = null,
 
     @SerializedName("strHomeLineupForward")
-    var homeLineupForward:String? = null,
+    var homeLineupForward: String? = null,
     @SerializedName("strAwayLineupForward")
-    var awayLineupForward:String? = null,
+    var awayLineupForward: String? = null,
 
     @SerializedName("strHomeLineupSubstitutes")
-    var homeLineupSubstitutes:String? = null,
+    var homeLineupSubstitutes: String? = null,
     @SerializedName("strAwayLineupSubstitutes")
-    var awayLineupSubstitutes:String? = null,
+    var awayLineupSubstitutes: String? = null,
 
     @SerializedName("idHomeTeam")
-    var homeTeamId:String,
+    var homeTeamId: String,
     @SerializedName("idAwayTeam")
-    var awayTeamId:String,
+    var awayTeamId: String,
 
-    var homeBadge:String?,
-    var awayBadge:String?
-):Parcelable
+    var homeBadge: String?,
+    var awayBadge: String?
+) : Parcelable

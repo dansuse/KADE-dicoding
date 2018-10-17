@@ -19,7 +19,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainAdapter (private val events: List<Event>, private val listener: (Event) -> Unit) : RecyclerView.Adapter<MatchViewHolder>(){
+class MainAdapter(private val events: List<Event>, private val listener: (Event) -> Unit) : RecyclerView.Adapter<MatchViewHolder>() {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MatchViewHolder {
     return MatchViewHolder(MatchUI().createView(AnkoContext.create(parent.context, parent)))
   }
@@ -31,42 +31,42 @@ class MainAdapter (private val events: List<Event>, private val listener: (Event
   }
 }
 
-class MatchViewHolder(view: View): RecyclerView.ViewHolder(view){
+class MatchViewHolder(view: View) : RecyclerView.ViewHolder(view) {
   private val teamBadgeHome: ImageView = view.find(R.id.team_badge_home)
   private val teamNameHome: TextView = view.find(R.id.team_name_home)
   private val teamBadgeAway: ImageView = view.find(R.id.team_badge_away)
   private val teamNameAway: TextView = view.find(R.id.team_name_away)
   private val matchScore: TextView = view.find(R.id.match_score)
   private val matchDate: TextView = view.find(R.id.match_date)
-  private val progressBarHomeBadge:ProgressBar = view.find(R.id.home_badge_progress_bar)
-  private val progressBarAwayBadge:ProgressBar = view.find(R.id.away_badge_progress_bar)
-  private lateinit var event:Event
+  private val progressBarHomeBadge: ProgressBar = view.find(R.id.home_badge_progress_bar)
+  private val progressBarAwayBadge: ProgressBar = view.find(R.id.away_badge_progress_bar)
+  private lateinit var event: Event
 
 
-  fun bindItem(event: Event, listener: (Event) -> Unit){
+  fun bindItem(event: Event, listener: (Event) -> Unit) {
     this.event = event
     itemView.onClick {
       listener(event)
     }
 
     val inputFormat = SimpleDateFormat("dd/MM/yy", Locale.US)
-    val date:Date = inputFormat.parse(event.date)
+    val date: Date = inputFormat.parse(event.date)
     val outputFormat = SimpleDateFormat("E, dd MMM yyyy")
 
-    if(event.homeBadge != null){
+    if (event.homeBadge != null) {
       progressBarHomeBadge.invisible()
       teamBadgeHome.visible()
       Picasso.get().load(event.homeBadge).into(teamBadgeHome)
-    }else{
+    } else {
       progressBarHomeBadge.visible()
       teamBadgeHome.invisible()
     }
 
-    if(event.awayBadge != null){
+    if (event.awayBadge != null) {
       progressBarAwayBadge.invisible()
       teamBadgeAway.visible()
       Picasso.get().load(event.awayBadge).into(teamBadgeAway)
-    }else{
+    } else {
       progressBarAwayBadge.visible()
       teamBadgeAway.invisible()
     }
@@ -74,11 +74,12 @@ class MatchViewHolder(view: View): RecyclerView.ViewHolder(view){
     teamNameHome.text = event.homeTeamName
     teamNameAway.text = event.awayTeamName
     matchDate.text = outputFormat.format(date)
-    matchScore.text = itemView.context.getString(R.string.match_score, event.homeScore?:'-', event.awayScore?:'-')
+    matchScore.text = itemView.context.getString(R.string.match_score, event.homeScore
+        ?: '-', event.awayScore ?: '-')
   }
 }
 
-class MatchUI:AnkoComponent<ViewGroup>{
+class MatchUI : AnkoComponent<ViewGroup> {
   override fun createView(ui: AnkoContext<ViewGroup>): View {
     return with(ui) {
       linearLayout {
@@ -90,7 +91,7 @@ class MatchUI:AnkoComponent<ViewGroup>{
           id = R.id.match_date
           textSize = 16f
           gravity = Gravity.CENTER
-        }.lparams{
+        }.lparams {
           bottomMargin = dip(8)
           width = matchParent
         }
@@ -102,7 +103,7 @@ class MatchUI:AnkoComponent<ViewGroup>{
 
           teamUI(R.id.team_badge_home, R.id.team_name_home, R.id.home_badge_progress_bar)
 
-          textView{
+          textView {
             id = R.id.match_score
             textSize = 16f
             gravity = Gravity.CENTER
@@ -115,8 +116,9 @@ class MatchUI:AnkoComponent<ViewGroup>{
       }
     }
   }
-  fun _LinearLayout.teamUI(idImageView:Int, idTextView:Int, idProgressBar:Int){
-    linearLayout{
+
+  fun _LinearLayout.teamUI(idImageView: Int, idTextView: Int, idProgressBar: Int) {
+    linearLayout {
       orientation = LinearLayout.VERTICAL
       lparams(width = dip(0), height = wrapContent, weight = 2.0f)
       gravity = Gravity.CENTER_HORIZONTAL
@@ -128,17 +130,17 @@ class MatchUI:AnkoComponent<ViewGroup>{
           scaleType = ImageView.ScaleType.CENTER_INSIDE
         }.lparams(
             width = dip(50), height = dip(50)
-        ){
+        ) {
           gravity = Gravity.CENTER
         }
         progressBar {
           id = idProgressBar
-        }.lparams{
+        }.lparams {
           gravity = Gravity.CENTER
         }
       }
 
-      textView{
+      textView {
         id = idTextView
         textSize = 12f
         gravity = Gravity.CENTER

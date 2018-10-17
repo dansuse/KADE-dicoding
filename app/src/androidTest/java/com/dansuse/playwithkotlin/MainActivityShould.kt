@@ -23,7 +23,7 @@ import com.dansuse.playwithkotlin.presenter.DetailPresenter
 import com.dansuse.playwithkotlin.presenter.MainPresenter
 import com.dansuse.playwithkotlin.view.activity.DetailActivity
 import com.dansuse.playwithkotlin.view.activity.MainActivity
-import com.dansuse.playwithkotlin.view.fragment.MatchesFragment
+import com.dansuse.playwithkotlin.view.matches.MatchesFragment
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
