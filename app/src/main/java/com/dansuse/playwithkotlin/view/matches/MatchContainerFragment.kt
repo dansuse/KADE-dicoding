@@ -42,6 +42,7 @@ class MatchContainerFragment : Fragment(), AnkoComponent<Context> {
       tabLayout = tabLayout {
         id = R.id.tab_layout_matches
         minimumHeight = dimenAttr(R.attr.actionBarSize)
+        setTabTextColors(Color.LTGRAY, Color.WHITE)
         setSelectedTabIndicatorColor(Color.WHITE)
         setBackgroundResource(R.color.colorPrimary)
         tabMode = TabLayout.MODE_FIXED

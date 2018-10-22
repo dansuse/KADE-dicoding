@@ -1,5 +1,6 @@
 package com.dansuse.playwithkotlin.view.matches
 
+import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.support.test.espresso.idling.CountingIdlingResource
@@ -8,10 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import com.dansuse.playwithkotlin.R
 import com.dansuse.playwithkotlin.invisible
@@ -22,6 +20,7 @@ import com.dansuse.playwithkotlin.repository.TheSportDBApiService
 import com.dansuse.playwithkotlin.view.MainView
 import com.dansuse.playwithkotlin.view.activity.DetailActivity
 import com.dansuse.playwithkotlin.view.adapter.MainAdapter
+import com.dansuse.playwithkotlin.view.searchmatch.SearchableActivity
 import com.dansuse.playwithkotlin.visible
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -67,7 +66,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
       }
     }
 
-    adapter = MainAdapter(events) {
+    adapter = MainAdapter(isPrevMatchMode, events) {
       context?.startActivity<DetailActivity>("event" to it.id)
     }
     listTeam.adapter = adapter
@@ -100,6 +99,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    setHasOptionsMenu(true)
     return createView(AnkoContext.create(requireContext()))
   }
 
@@ -141,6 +141,21 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
         }
       }
     }
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    inflater?.inflate(R.menu.master_menu, menu)
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    return when(item?.itemId){
+      R.id.action_search -> {
+        context?.startActivity<SearchableActivity>()
+        true
+      }
+      else -> super.onOptionsItemSelected(item)
+    }
+
   }
 
   override fun showLoading() {

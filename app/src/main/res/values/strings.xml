@@ -26,6 +26,9 @@
     <string name="next_match_tab_label">NEXT</string>
     <string name="past_match_tab_label">PAST</string>
 
+    <string name="search">Search</string>
+    <string name="match_search_hint">Arsenal vs Chelsea</string>
+
     <array name="league">
         <item>English Premier League</item>
         <item>English League Championship</item>

@@ -4,8 +4,13 @@ import android.database.sqlite.SQLiteConstraintException
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.AppBarLayout
+import android.support.design.widget.CollapsingToolbarLayout
+import android.support.design.widget.TabLayout
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewPager
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Gravity
 import android.view.Menu
@@ -15,31 +20,35 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.dansuse.playwithkotlin.R
-import com.dansuse.playwithkotlin.R.color.colorAccent
 import com.dansuse.playwithkotlin.database.database
-import com.dansuse.playwithkotlin.invisible
 import com.dansuse.playwithkotlin.model.FavoriteTeam
 import com.dansuse.playwithkotlin.model.Team
-import com.dansuse.playwithkotlin.visible
 import com.squareup.picasso.Picasso
 import org.jetbrains.anko.*
 import org.jetbrains.anko.db.classParser
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.db.delete
-import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.support.v4.onRefresh
-import org.jetbrains.anko.support.v4.swipeRefreshLayout
-import com.dansuse.playwithkotlin.presenter.TeamDetailPresenter
+import com.dansuse.playwithkotlin.presenter.teamdetail.TeamDetailPresenter
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
+import com.dansuse.playwithkotlin.view.adapter.TeamDetailTabAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.appcompat.v7.toolbar
+import org.jetbrains.anko.design.*
+import org.jetbrains.anko.support.v4.viewPager
 
 
 class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
 
+  private lateinit var toolbar: Toolbar
+
   private lateinit var progressBar: ProgressBar
   private lateinit var swipeRefresh: SwipeRefreshLayout
+
+  private lateinit var tabAdapter: TeamDetailTabAdapter
+  private lateinit var tabLayout: TabLayout
+  private lateinit var viewPager: ViewPager
 
   private lateinit var teamBadge: ImageView
   private lateinit var teamName: TextView
@@ -57,60 +66,147 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    linearLayout {
-      lparams(width = matchParent, height = wrapContent)
-      orientation = LinearLayout.VERTICAL
-      backgroundColor = Color.WHITE
+    coordinatorLayout {
+      lparams(width = matchParent, height = matchParent)
+      fitsSystemWindows = true
 
-      swipeRefresh = swipeRefreshLayout {
-        setColorSchemeResources(colorAccent,
-            android.R.color.holo_green_light,
-            android.R.color.holo_orange_light,
-            android.R.color.holo_red_light)
+      appBarLayout {
+        id = R.id.appbar
+        setTheme(R.style.ThemeOverlay_AppCompat_Dark_ActionBar)
+        fitsSystemWindows = true
 
-        scrollView {
-          isVerticalScrollBarEnabled = false
-          relativeLayout {
-            lparams(width = matchParent, height = wrapContent)
+        collapsingToolbarLayout {
+          id = R.id.collapsing_toolbar
+          fitsSystemWindows = true
+          isTitleEnabled = false
+          setContentScrimColor(ContextCompat.getColor(context, R.color.colorPrimary))
+          setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
 
-            linearLayout {
-              lparams(width = matchParent, height = wrapContent)
-              padding = dip(10)
-              orientation = LinearLayout.VERTICAL
-              gravity = Gravity.CENTER_HORIZONTAL
+          linearLayout {
+            padding = dip(10)
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
 
-              teamBadge = imageView {}.lparams(height = dip(75))
+            teamBadge = imageView {}.lparams(height = dip(75))
 
-              teamName = textView {
-                this.gravity = Gravity.CENTER
-                textSize = 20f
-                textColor = ContextCompat.getColor(context, colorAccent)
-              }.lparams {
-                topMargin = dip(5)
-              }
-
-              teamFormedYear = textView {
-                this.gravity = Gravity.CENTER
-              }
-
-              teamStadium = textView {
-                this.gravity = Gravity.CENTER
-                textColor = ContextCompat.getColor(context, R.color.colorPrimaryText)
-              }
-
-              teamDescription = textView().lparams {
-                topMargin = dip(20)
-              }
-            }
-            progressBar = progressBar {
+            teamName = textView {
+              this.gravity = Gravity.CENTER
+              textSize = 20f
+              textColor = Color.WHITE
             }.lparams {
-              centerHorizontally()
+              topMargin = dip(5)
             }
+
+            teamFormedYear = textView {
+              this.gravity = Gravity.CENTER
+              textColor = Color.WHITE
+            }
+
+            teamStadium = textView {
+              this.gravity = Gravity.CENTER
+              textColor = Color.WHITE
+            }
+          }.lparams(width = matchParent, height = wrapContent){
+            setMargins(dip(0), dip(75), dip(0), dip(30))
           }
+
+          toolbar = toolbar {
+            id = R.id.toolbar
+            setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
+          }.lparams(height = dimenAttr(R.attr.actionBarSize), width = matchParent)
+          {
+//            scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
+            gravity = Gravity.TOP
+          }
+
+          tabLayout = tabLayout {
+            id = R.id.tab_layout_detail_team
+            tabGravity = TabLayout.GRAVITY_FILL
+            tabMode = TabLayout.MODE_FIXED
+            minimumHeight = dimenAttr(R.attr.actionBarSize)
+            setTabTextColors(Color.LTGRAY, Color.WHITE)
+            setSelectedTabIndicatorColor(Color.WHITE)
+            setBackgroundResource(R.color.colorPrimary)
+          }.lparams (width = matchParent, height = wrapContent) {
+            gravity = Gravity.BOTTOM
+            collapseMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PIN
+          }
+
+        }.lparams(width = matchParent, height = wrapContent){
+          scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED or AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
         }
+
+      }.lparams(width = matchParent, height = wrapContent)
+
+      viewPager = viewPager {
+        id = R.id.view_pager_team_detail
+      }.lparams(width = matchParent, height = matchParent){
+        behavior = AppBarLayout.ScrollingViewBehavior()
       }
+
+//      nestedScrollView {
+//
+//      }.lparams(width = matchParent, height = matchParent){
+//        behavior = AppBarLayout.ScrollingViewBehavior()
+//      }
     }
 
+//    linearLayout {
+//      lparams(width = matchParent, height = wrapContent)
+//      orientation = LinearLayout.VERTICAL
+//      backgroundColor = Color.WHITE
+//
+//      swipeRefresh = swipeRefreshLayout {
+//        setColorSchemeResources(colorAccent,
+//            android.R.color.holo_green_light,
+//            android.R.color.holo_orange_light,
+//            android.R.color.holo_red_light)
+//
+//        scrollView {
+//          isVerticalScrollBarEnabled = false
+//          relativeLayout {
+//            lparams(width = matchParent, height = wrapContent)
+//
+//            linearLayout {
+//              lparams(width = matchParent, height = wrapContent)
+//              padding = dip(10)
+//              orientation = LinearLayout.VERTICAL
+//              gravity = Gravity.CENTER_HORIZONTAL
+//
+//              teamBadge = imageView {}.lparams(height = dip(75))
+//
+//              teamName = textView {
+//                this.gravity = Gravity.CENTER
+//                textSize = 20f
+//                textColor = ContextCompat.getColor(context, colorAccent)
+//              }.lparams {
+//                topMargin = dip(5)
+//              }
+//
+//              teamFormedYear = textView {
+//                this.gravity = Gravity.CENTER
+//              }
+//
+//              teamStadium = textView {
+//                this.gravity = Gravity.CENTER
+//                textColor = ContextCompat.getColor(context, R.color.colorPrimaryText)
+//              }
+//
+//              teamDescription = textView().lparams {
+//                topMargin = dip(20)
+//              }
+//            }
+//            progressBar = progressBar {
+//            }.lparams {
+//              centerHorizontally()
+//            }
+//          }
+//        }
+//      }
+//    }
+
+    setSupportActionBar(toolbar)
     supportActionBar?.title = "Team Detail"
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -120,12 +216,39 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
     favoriteState()
     invalidateOptionsMenu()
 
-    presenter = TeamDetailPresenter(this, TheSportDBApiService.create(),
+    tabAdapter = TeamDetailTabAdapter(supportFragmentManager)
+    viewPager.adapter = tabAdapter
+    tabLayout.setupWithViewPager(viewPager)
+//    tabLayout.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener{
+//      override fun onTabReselected(p0: TabLayout.Tab?) {
+//
+//      }
+//
+//      override fun onTabUnselected(p0: TabLayout.Tab?) {
+//
+//      }
+//
+//      override fun onTabSelected(tab: TabLayout.Tab?) {
+////        if(tab?.position != null) {
+////          viewPager.currentItem = tab?.position!!
+////        }
+////        if(tab?.position == 1){
+////          if(teams.teamId != null){
+////            presenter.getPlayersByTeamId(teams.teamId!!)
+////          }
+////        }else if(tab?.position == 0){
+////
+////        }
+//      }
+//    })
+
+    presenter = TeamDetailPresenter(this, tabAdapter.getItem(0) as TeamOverviewView, tabAdapter.getItem(1) as PlayersView, TheSportDBApiService.create(),
         Schedulers.io(), AndroidSchedulers.mainThread())
     presenter.getTeamDetail(id)
-    swipeRefresh.onRefresh {
-      presenter.getTeamDetail(id)
-    }
+//    swipeRefresh.onRefresh {
+//      presenter.getTeamDetail(id)
+//    }
+
 
   }
 
@@ -180,9 +303,9 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
             FavoriteTeam.TEAM_NAME to teams.teamName,
             FavoriteTeam.TEAM_BADGE to teams.teamBadge)
       }
-      snackbar(swipeRefresh, "Added to favorite").show()
+      swipeRefresh.snackbar("Added to favorite").show()
     } catch (e: SQLiteConstraintException) {
-      snackbar(swipeRefresh, e.localizedMessage).show()
+      swipeRefresh.snackbar(e.message ?: "Terjadi error saat menambahkan team ke daftar favorit").show()
     }
   }
 
@@ -191,33 +314,42 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
       database.use {
         delete(FavoriteTeam.TABLE_FAVORITE, "(TEAM_ID = {id})", "id" to id)
       }
-      snackbar(swipeRefresh, "Removed to favorite").show()
+      swipeRefresh.snackbar("Removed to favorite").show()
     } catch (e: SQLiteConstraintException) {
-      snackbar(swipeRefresh, e.localizedMessage).show()
+      swipeRefresh.snackbar(e.message ?: "Terjadi error saat remove team dari daftar favorit").show()
     }
   }
 
   override fun showLoading() {
-    progressBar.visible()
+    //progressBar.visible()
   }
 
   override fun hideLoading() {
-    progressBar.invisible()
+    //progressBar.invisible()
   }
 
   override fun showTeamDetail(data: List<Team>) {
-    swipeRefresh.isRefreshing = false
+    //swipeRefresh.isRefreshing = false
     if (data.isNotEmpty()) {
       teams = data[0]
       Picasso.get().load(teams.teamBadge).into(teamBadge)
       teamName.text = teams.teamName
       teamFormedYear.text = teams.teamFormedYear
       teamStadium.text = teams.teamStadium
-      teamDescription.text = teams.teamDescription
+      tabAdapter.teamId = teams.teamId
+//      teamDescription.text = teams.teamDescription
+//      val teamOverviewView = (tabAdapter.getItem(0) as TeamOverviewView)
+//      teamOverviewView.hideLoading()
+//      teamOverviewView.showTeamDescription(teams.teamDescription?:"")
     }
   }
 
   override fun showErrorMessage(errorMessage: String) {
 
+  }
+
+  override fun onDestroy() {
+    presenter.dispose()
+    super.onDestroy()
   }
 }

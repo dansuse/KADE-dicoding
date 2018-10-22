@@ -6,6 +6,8 @@
     <item name="team_badge_away" type="id"/>
     <item name="match_score" type="id"/>
     <item name="match_date" type="id"/>
+    <item name="match_time" type="id"/>
+    <item name="add_to_calendar" type="id"/>
     <item name="bottom_navigation_bar" type="id"/>
     <item name="home_badge_progress_bar" type="id"/>
     <item name="away_badge_progress_bar" type="id"/>
@@ -63,4 +65,15 @@
     <item name="list_team" type="id"/>
     <item name="team_name" type="id"/>
     <item name="team_badge" type="id"/>
+
+    <item name="appbar" type="id"/>
+    <item name="collapsing_toolbar" type="id"/>
+    <item name="toolbar" type="id"/>
+    <item name="tab_layout_detail_team" type="id"/>
+
+    <item name="view_pager_team_detail" type="id"/>
+    <item name="list_player" type="id"/>
+    <item name="player_photo" type="id"/>
+    <item name="player_name" type="id"/>
+    <item name="player_position" type="id"/>
 </resources>

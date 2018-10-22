@@ -9,8 +9,14 @@ data class Event(
     @SerializedName("idEvent")
     var id: String? = null,
 
+    @SerializedName("strEvent")
+    var title: String? = null,
+
     @SerializedName("strDate")
     var date: String? = null,
+
+    @SerializedName("strTime")
+    var time: String? = null,
 
     @SerializedName("intHomeScore")
     var homeScore: String? = null,

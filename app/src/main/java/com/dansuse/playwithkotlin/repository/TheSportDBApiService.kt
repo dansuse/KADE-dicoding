@@ -3,6 +3,7 @@ package com.dansuse.playwithkotlin.repository
 import com.dansuse.playwithkotlin.BuildConfig
 import com.dansuse.playwithkotlin.model.EventResponse
 import com.dansuse.playwithkotlin.model.LeagueResponse
+import com.dansuse.playwithkotlin.model.PlayerResponse
 import com.dansuse.playwithkotlin.model.TeamResponse
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -42,5 +43,15 @@ interface TheSportDBApiService {
   @GET("api/v1/json/" + BuildConfig.TSDB_API_KEY + "/search_all_teams.php")
   fun getTeams(@Query("l") league: String): Observable<TeamResponse>
 
+  @GET("api/v1/json/" + BuildConfig.TSDB_API_KEY + "/searchevents.php")
+  fun searchEvent(@Query("e") eventQuery:String):Observable<EventResponse>
 
+  @GET("api/v1/json/" + BuildConfig.TSDB_API_KEY + "/searchteams.php")
+  fun searchTeam(@Query("t") teamQuery:String):Observable<TeamResponse>
+
+  @GET("api/v1/json/" + BuildConfig.TSDB_API_KEY + "/lookup_all_players.php")
+  fun getPlayersByTeamId(@Query("id") teamId:String):Observable<PlayerResponse>
+
+  @GET("api/v1/json/" + BuildConfig.TSDB_API_KEY + "/lookupplayer.php")
+  fun getPlayerDetail(@Query("id") playerId:String):Observable<PlayerResponse>
 }
