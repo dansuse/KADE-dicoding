@@ -19,9 +19,9 @@ import android.support.test.runner.AndroidJUnit4
 import android.support.v7.widget.RecyclerView
 import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.League
-import com.dansuse.playwithkotlin.presenter.DetailPresenter
-import com.dansuse.playwithkotlin.presenter.MainPresenter
-import com.dansuse.playwithkotlin.view.activity.DetailActivity
+import com.dansuse.playwithkotlin.presenter.MatchDetailPresenter
+import com.dansuse.playwithkotlin.presenter.MatchesPresenter
+import com.dansuse.playwithkotlin.view.matchdetail.MatchDetailActivity
 import com.dansuse.playwithkotlin.view.activity.MainActivity
 import com.dansuse.playwithkotlin.view.matches.MatchesFragment
 import org.hamcrest.Matchers.*
@@ -37,8 +37,8 @@ import org.mockito.Mockito.*
 @RunWith(AndroidJUnit4::class)
 class MainActivityShould {
 
-    private val mainPresenter = Mockito.mock(MainPresenter::class.java)
-    private val detailPresenter = Mockito.mock(DetailPresenter::class.java)
+    private val mainPresenter = Mockito.mock(MatchesPresenter::class.java)
+    private val detailPresenter = Mockito.mock(MatchDetailPresenter::class.java)
 
     private val events = listOf(
             Event(
@@ -119,9 +119,9 @@ class MainActivityShould {
 
     @Rule
     @JvmField var detailActivityRule =
-            object : ActivityTestRule<DetailActivity>(DetailActivity::class.java, true, false){
+            object : ActivityTestRule<MatchDetailActivity>(MatchDetailActivity::class.java, true, false){
                 override fun beforeActivityLaunched() {
-                    DetailActivity.presenter = detailPresenter
+                    MatchDetailActivity.presenter = detailPresenter
                 }
             }
 
@@ -183,7 +183,7 @@ class MainActivityShould {
         onView(withId(R.id.list_event)).perform(
                 RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(1, click()))
 
-        intended(allOf(hasComponent(DetailActivity::class.java.name), hasExtra("event", events[1].id)))
+        intended(allOf(hasComponent(MatchDetailActivity::class.java.name), hasExtra("event", events[1].id)))
 
         Intents.release()
     }
@@ -205,7 +205,7 @@ class MainActivityShould {
         InstrumentationRegistry.getTargetContext().deleteDatabase("FavoriteEvent.db")
 
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
-        val intent:Intent = Intent(targetContext, DetailActivity::class.java).apply {
+        val intent:Intent = Intent(targetContext, MatchDetailActivity::class.java).apply {
             putExtra("event", events[1].id)
         }
         detailActivityRule.launchActivity(intent)
@@ -252,7 +252,7 @@ class MainActivityShould {
         InstrumentationRegistry.getTargetContext().deleteDatabase("FavoriteEvent.db")
 
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
-        val intent:Intent = Intent(targetContext, DetailActivity::class.java).apply {
+        val intent:Intent = Intent(targetContext, MatchDetailActivity::class.java).apply {
             putExtra("event", events[1].id)
         }
         detailActivityRule.launchActivity(intent)
@@ -272,7 +272,7 @@ class MainActivityShould {
         onView((withId(R.id.list_favorite_event))).check(matches(isDisplayed()))
         onView(withId(R.id.list_favorite_event)).perform(
                 RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click()))
-        intended(allOf(hasComponent(DetailActivity::class.java.name), hasExtra("event", events[1].id)))
+        intended(allOf(hasComponent(MatchDetailActivity::class.java.name), hasExtra("event", events[1].id)))
         Intents.release()
     }
 

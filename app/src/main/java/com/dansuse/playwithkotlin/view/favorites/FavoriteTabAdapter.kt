@@ -1,12 +1,10 @@
-package com.dansuse.playwithkotlin.view.adapter
+package com.dansuse.playwithkotlin.view.favorites
 
-import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import com.dansuse.playwithkotlin.view.favorites.FavoriteMatchesFragment
-import com.dansuse.playwithkotlin.view.favorites.FavoriteTeamsFragment
-import com.dansuse.playwithkotlin.view.matches.MatchesFragment
+import com.dansuse.playwithkotlin.view.favorites.favoritematches.FavoriteMatchesFragment
+import com.dansuse.playwithkotlin.view.favorites.favoriteteams.FavoriteTeamsFragment
 
 class FavoriteTabAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 

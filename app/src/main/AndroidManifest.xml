@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.activity.DetailActivity"
+            android:name=".view.matchdetail.MatchDetailActivity"
             android:label="@string/detail_activity_label"
             android:parentActivityName=".view.activity.MainActivity">
             <meta-data
@@ -40,8 +40,15 @@
         </activity>
         <activity
             android:name=".view.teamdetail.TeamDetailActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
-        <activity android:name=".view.teamdetail.PlayerDetailActivity"></activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:launchMode="singleTop"></activity>
+        <activity
+            android:name=".view.teamdetail.players.playerdetail.PlayerDetailActivity"
+            android:parentActivityName=".view.teamdetail.TeamDetailActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".view.teamdetail.TeamDetailActivity" />
+        </activity>
     </application>
 
 </manifest>

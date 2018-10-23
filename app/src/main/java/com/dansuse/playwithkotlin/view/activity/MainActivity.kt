@@ -7,7 +7,7 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import com.dansuse.playwithkotlin.R
 import com.dansuse.playwithkotlin.view.favorites.FavoriteContainerFragment
-import com.dansuse.playwithkotlin.view.favorites.FavoriteMatchesFragment
+import com.dansuse.playwithkotlin.view.favorites.favoritematches.FavoriteMatchesFragment
 import com.dansuse.playwithkotlin.view.matches.MatchContainerFragment
 import com.dansuse.playwithkotlin.view.matches.MatchesFragment
 import com.dansuse.playwithkotlin.view.teams.TeamsFragment

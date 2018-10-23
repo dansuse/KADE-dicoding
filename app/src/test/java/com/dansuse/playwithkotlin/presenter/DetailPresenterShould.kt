@@ -5,7 +5,7 @@ import com.dansuse.playwithkotlin.model.EventResponse
 import com.dansuse.playwithkotlin.model.Team
 import com.dansuse.playwithkotlin.model.TeamResponse
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
-import com.dansuse.playwithkotlin.view.DetailView
+import com.dansuse.playwithkotlin.view.matchdetail.MatchDetailView
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.TestScheduler
@@ -60,25 +60,25 @@ class DetailPresenterShould{
 
     @Mock
     private
-    lateinit var view: DetailView
+    lateinit var view: MatchDetailView
 
     @Mock
     private
     lateinit var theSportDBApiService: TheSportDBApiService
 
-    lateinit var detailPresenter: DetailPresenter
+    lateinit var detailPresenter: MatchDetailPresenter
     lateinit var testScheduler: TestScheduler
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         testScheduler = TestScheduler()
-        detailPresenter = DetailPresenter(view, theSportDBApiService, testScheduler, testScheduler)
+        detailPresenter = MatchDetailPresenter(view, theSportDBApiService, testScheduler, testScheduler)
     }
 
     @Test
     fun send_result_when_get_event_detail_by_id_success() {
-        val eventResponse = EventResponse(listOf(event))
+        val eventResponse = EventResponse(listOf(event), listOf(event))
         val homeTeamResponse = TeamResponse(listOf(homeTeam))
         val awayTeamResponse = TeamResponse(listOf(awayTeam))
 
@@ -111,7 +111,7 @@ class DetailPresenterShould{
     @Test
     fun send_error_when_get_team_detail_failed(){
         val errorMessage = "Terjadi network error"
-        val eventResponse = EventResponse(listOf(event))
+        val eventResponse = EventResponse(listOf(event), listOf(event))
         val homeTeamResponse = TeamResponse(listOf(homeTeam))
         `when`(theSportDBApiService.getEventDetail(event.id!!.toInt())).thenReturn(Observable.just(eventResponse))
         `when`(theSportDBApiService.getTeamDetail(event.homeTeamId.toInt()))

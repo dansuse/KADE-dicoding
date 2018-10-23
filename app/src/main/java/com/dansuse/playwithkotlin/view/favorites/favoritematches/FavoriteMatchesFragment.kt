@@ -1,4 +1,4 @@
-package com.dansuse.playwithkotlin.view.favorites
+package com.dansuse.playwithkotlin.view.favorites.favoritematches
 
 import android.content.Context
 import android.os.Bundle
@@ -13,8 +13,7 @@ import com.dansuse.playwithkotlin.EspressoIdlingResource
 import com.dansuse.playwithkotlin.R
 import com.dansuse.playwithkotlin.database.database
 import com.dansuse.playwithkotlin.model.FavoriteMatch
-import com.dansuse.playwithkotlin.view.activity.DetailActivity
-import com.dansuse.playwithkotlin.view.adapter.FavoriteTeamsAdapter
+import com.dansuse.playwithkotlin.view.matchdetail.MatchDetailActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.db.classParser
 import org.jetbrains.anko.db.select
@@ -26,15 +25,15 @@ import org.jetbrains.anko.support.v4.swipeRefreshLayout
 class FavoriteMatchesFragment : Fragment(), AnkoComponent<Context> {
 
   private var favoriteMatches: MutableList<FavoriteMatch> = mutableListOf()
-  private lateinit var adapter: FavoriteTeamsAdapter
+  private lateinit var adapter: FavoriteMatchesAdapter
   private lateinit var listEvent: RecyclerView
   private lateinit var swipeRefresh: SwipeRefreshLayout
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
 
-    adapter = FavoriteTeamsAdapter(favoriteMatches) {
-      requireContext().startActivity<DetailActivity>("event" to "${it.eventId}")
+    adapter = FavoriteMatchesAdapter(favoriteMatches) {
+      requireContext().startActivity<MatchDetailActivity>("event" to "${it.eventId}")
     }
 
     listEvent.adapter = adapter

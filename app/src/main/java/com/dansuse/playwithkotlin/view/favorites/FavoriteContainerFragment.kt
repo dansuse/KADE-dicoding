@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.dansuse.playwithkotlin.R
-import com.dansuse.playwithkotlin.view.adapter.FavoriteTabAdapter
 
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.tabLayout
@@ -32,6 +31,7 @@ class FavoriteContainerFragment : Fragment(), AnkoComponent<Context> {
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    setHasOptionsMenu(false)
     return createView(AnkoContext.create(requireContext()))
   }
 
@@ -44,6 +44,7 @@ class FavoriteContainerFragment : Fragment(), AnkoComponent<Context> {
         minimumHeight = dimenAttr(R.attr.actionBarSize)
         setSelectedTabIndicatorColor(Color.WHITE)
         setBackgroundResource(R.color.colorPrimary)
+        setTabTextColors(Color.LTGRAY, Color.WHITE)
         tabMode = TabLayout.MODE_FIXED
 
       }.lparams(width = matchParent, height = wrapContent)

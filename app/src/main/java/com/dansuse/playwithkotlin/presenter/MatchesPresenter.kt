@@ -3,14 +3,14 @@ package com.dansuse.playwithkotlin.presenter
 import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.TeamResponse
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
-import com.dansuse.playwithkotlin.view.MainView
+import com.dansuse.playwithkotlin.view.matches.MatchesView
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 
-open class MainPresenter(
-    private val view: MainView,
+open class MatchesPresenter(
+    private val view: MatchesView,
     private val theSportDBApiService: TheSportDBApiService,
     private val processScheduler: Scheduler,
     private val androidScheduler: Scheduler) {

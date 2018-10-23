@@ -6,10 +6,10 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CollapsingToolbarLayout
+import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.TabLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
-import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Gravity
@@ -17,8 +17,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.TextView
+import com.dansuse.playwithkotlin.EspressoIdlingResource
 import com.dansuse.playwithkotlin.R
 import com.dansuse.playwithkotlin.database.database
 import com.dansuse.playwithkotlin.model.FavoriteTeam
@@ -31,7 +31,8 @@ import org.jetbrains.anko.db.select
 import org.jetbrains.anko.db.delete
 import com.dansuse.playwithkotlin.presenter.teamdetail.TeamDetailPresenter
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
-import com.dansuse.playwithkotlin.view.adapter.TeamDetailTabAdapter
+import com.dansuse.playwithkotlin.view.teamdetail.overview.TeamOverviewView
+import com.dansuse.playwithkotlin.view.teamdetail.players.PlayersView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.appcompat.v7.toolbar
@@ -43,13 +44,14 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
 
   private lateinit var toolbar: Toolbar
 
-  private lateinit var progressBar: ProgressBar
-  private lateinit var swipeRefresh: SwipeRefreshLayout
+  //private lateinit var progressBar: ProgressBar
+  //private lateinit var swipeRefresh: SwipeRefreshLayout
 
   private lateinit var tabAdapter: TeamDetailTabAdapter
   private lateinit var tabLayout: TabLayout
   private lateinit var viewPager: ViewPager
 
+  private lateinit var coordinatorLayout: CoordinatorLayout
   private lateinit var teamBadge: ImageView
   private lateinit var teamName: TextView
   private lateinit var teamFormedYear: TextView
@@ -57,7 +59,7 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
   private lateinit var teamDescription: TextView
 
   private lateinit var presenter: TeamDetailPresenter
-  private lateinit var teams: Team
+  private var teams: Team? = null
   private lateinit var id: String
 
   private var menuItem: Menu? = null
@@ -66,7 +68,7 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    coordinatorLayout {
+    coordinatorLayout = coordinatorLayout {
       lparams(width = matchParent, height = matchParent)
       fitsSystemWindows = true
 
@@ -216,7 +218,7 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
     favoriteState()
     invalidateOptionsMenu()
 
-    tabAdapter = TeamDetailTabAdapter(supportFragmentManager)
+    tabAdapter = TeamDetailTabAdapter(supportFragmentManager, id)
     viewPager.adapter = tabAdapter
     tabLayout.setupWithViewPager(viewPager)
 //    tabLayout.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener{
@@ -253,7 +255,7 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
   }
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-    Log.d("tes123", "masuk on create option menu")
+    //Log.d("tes123", "masuk on create option menu")
     menuInflater.inflate(R.menu.detail_menu, menu)
     menuItem = menu
     setFavorite()
@@ -296,28 +298,36 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
   }
 
   private fun addToFavorite() {
-    try {
-      database.use {
-        insert(FavoriteTeam.TABLE_FAVORITE,
-            FavoriteTeam.TEAM_ID to teams.teamId,
-            FavoriteTeam.TEAM_NAME to teams.teamName,
-            FavoriteTeam.TEAM_BADGE to teams.teamBadge)
+    EspressoIdlingResource.mCountingIdlingResource.increment()
+    if(teams!=null){
+      try {
+        database.use {
+          insert(FavoriteTeam.TABLE_FAVORITE,
+              FavoriteTeam.TEAM_ID to teams?.teamId,
+              FavoriteTeam.TEAM_NAME to teams?.teamName,
+              FavoriteTeam.TEAM_BADGE to teams?.teamBadge)
+        }
+        coordinatorLayout.snackbar("Added to favorite").show()
+      } catch (e: SQLiteConstraintException) {
+        coordinatorLayout.snackbar(e.message ?: "Terjadi error saat menambahkan team ke daftar favorit").show()
       }
-      swipeRefresh.snackbar("Added to favorite").show()
-    } catch (e: SQLiteConstraintException) {
-      swipeRefresh.snackbar(e.message ?: "Terjadi error saat menambahkan team ke daftar favorit").show()
+    }else{
+      coordinatorLayout.snackbar(getString(R.string.event_is_still_loading)).show()
     }
+    EspressoIdlingResource.mCountingIdlingResource.decrement()
   }
 
   private fun removeFromFavorite() {
+    EspressoIdlingResource.mCountingIdlingResource.increment()
     try {
       database.use {
         delete(FavoriteTeam.TABLE_FAVORITE, "(TEAM_ID = {id})", "id" to id)
       }
-      swipeRefresh.snackbar("Removed to favorite").show()
+      coordinatorLayout.snackbar("Removed to favorite").show()
     } catch (e: SQLiteConstraintException) {
-      swipeRefresh.snackbar(e.message ?: "Terjadi error saat remove team dari daftar favorit").show()
+      coordinatorLayout.snackbar(e.message ?: "Terjadi error saat remove team dari daftar favorit").show()
     }
+    EspressoIdlingResource.mCountingIdlingResource.decrement()
   }
 
   override fun showLoading() {
@@ -332,11 +342,11 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
     //swipeRefresh.isRefreshing = false
     if (data.isNotEmpty()) {
       teams = data[0]
-      Picasso.get().load(teams.teamBadge).into(teamBadge)
-      teamName.text = teams.teamName
-      teamFormedYear.text = teams.teamFormedYear
-      teamStadium.text = teams.teamStadium
-      tabAdapter.teamId = teams.teamId
+      Picasso.get().load(teams?.teamBadge).into(teamBadge)
+      teamName.text = teams?.teamName
+      teamFormedYear.text = teams?.teamFormedYear
+      teamStadium.text = teams?.teamStadium
+//      tabAdapter.teamId = teams.teamId
 //      teamDescription.text = teams.teamDescription
 //      val teamOverviewView = (tabAdapter.getItem(0) as TeamOverviewView)
 //      teamOverviewView.hideLoading()

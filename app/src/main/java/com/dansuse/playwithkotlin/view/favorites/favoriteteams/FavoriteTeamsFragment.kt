@@ -1,4 +1,4 @@
-package com.dansuse.playwithkotlin.view.favorites
+package com.dansuse.playwithkotlin.view.favorites.favoriteteams
 
 import android.content.Context
 import android.os.Bundle
@@ -12,9 +12,8 @@ import android.view.ViewGroup
 import com.dansuse.playwithkotlin.EspressoIdlingResource
 import com.dansuse.playwithkotlin.R
 import com.dansuse.playwithkotlin.database.database
-import com.dansuse.playwithkotlin.model.FavoriteMatch
-import com.dansuse.playwithkotlin.view.activity.DetailActivity
-import com.dansuse.playwithkotlin.view.adapter.FavoriteTeamsAdapter
+import com.dansuse.playwithkotlin.model.FavoriteTeam
+import com.dansuse.playwithkotlin.view.teamdetail.TeamDetailActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.db.classParser
 import org.jetbrains.anko.db.select
@@ -25,7 +24,7 @@ import org.jetbrains.anko.support.v4.swipeRefreshLayout
 
 class FavoriteTeamsFragment : Fragment(), AnkoComponent<Context> {
 
-  private var favoriteMatches: MutableList<FavoriteMatch> = mutableListOf()
+  private var favoriteTeams: MutableList<FavoriteTeam> = mutableListOf()
   private lateinit var adapter: FavoriteTeamsAdapter
   private lateinit var listEvent: RecyclerView
   private lateinit var swipeRefresh: SwipeRefreshLayout
@@ -33,14 +32,14 @@ class FavoriteTeamsFragment : Fragment(), AnkoComponent<Context> {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
 
-    adapter = FavoriteTeamsAdapter(favoriteMatches) {
-      requireContext().startActivity<DetailActivity>("event" to "${it.eventId}")
+    adapter = FavoriteTeamsAdapter(favoriteTeams) {
+      requireContext().startActivity<TeamDetailActivity>("id" to "${it.teamId}")
     }
 
     listEvent.adapter = adapter
     showFavorite()
     swipeRefresh.onRefresh {
-      favoriteMatches.clear()
+      favoriteTeams.clear()
       showFavorite()
     }
   }
@@ -76,9 +75,9 @@ class FavoriteTeamsFragment : Fragment(), AnkoComponent<Context> {
     EspressoIdlingResource.mCountingIdlingResource.increment()
     context?.database?.use {
       swipeRefresh.isRefreshing = false
-      val result = select(FavoriteMatch.TABLE_FAVORITE)
-      val favorite = result.parseList(classParser<FavoriteMatch>())
-      favoriteMatches.addAll(favorite)
+      val result = select(FavoriteTeam.TABLE_FAVORITE)
+      val favorite = result.parseList(classParser<FavoriteTeam>())
+      favoriteTeams.addAll(favorite)
       adapter.notifyDataSetChanged()
     }
     EspressoIdlingResource.mCountingIdlingResource.decrement()

@@ -1,6 +1,5 @@
 package com.dansuse.playwithkotlin.view.matches
 
-import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.support.test.espresso.idling.CountingIdlingResource
@@ -8,18 +7,15 @@ import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.*
 import android.widget.*
 import com.dansuse.playwithkotlin.R
 import com.dansuse.playwithkotlin.invisible
 import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.League
-import com.dansuse.playwithkotlin.presenter.MainPresenter
+import com.dansuse.playwithkotlin.presenter.MatchesPresenter
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
-import com.dansuse.playwithkotlin.view.MainView
-import com.dansuse.playwithkotlin.view.activity.DetailActivity
-import com.dansuse.playwithkotlin.view.adapter.MainAdapter
+import com.dansuse.playwithkotlin.view.matchdetail.MatchDetailActivity
 import com.dansuse.playwithkotlin.view.searchmatch.SearchableActivity
 import com.dansuse.playwithkotlin.visible
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -28,11 +24,11 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.support.v4.swipeRefreshLayout
 
-class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
+class MatchesFragment : Fragment(), AnkoComponent<Context>, MatchesView {
 
   companion object {
     const val KEY_IS_PREV_MATCH_MODE = "key_is_prev_match_mode"
-    var presenter: MainPresenter? = null
+    var presenter: MatchesPresenter? = null
   }
 
   private lateinit var listTeam: RecyclerView
@@ -41,7 +37,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
   private lateinit var textViewErrorMessage: TextView
 
   private var events: MutableList<Event> = mutableListOf()
-  private lateinit var presenter: MainPresenter
+  private lateinit var presenter: MatchesPresenter
   private lateinit var adapter: MainAdapter
   private var leagueId: String? = null
   private var isPrevMatchMode: Boolean = true
@@ -67,7 +63,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
     }
 
     adapter = MainAdapter(isPrevMatchMode, events) {
-      context?.startActivity<DetailActivity>("event" to it.id)
+      context?.startActivity<MatchDetailActivity>("event" to it.id)
     }
     listTeam.adapter = adapter
 
@@ -76,7 +72,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
 
     spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
       override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        Log.d("tes123", "on item selected masuk")
+        //Log.d("tes123", "on item selected masuk")
         leagueId = (spinner.selectedItem as League).id
         if (isPrevMatchMode) {
           presenter.get15EventsByLeagueId(leagueId ?: "", isPrevMatchMode)
@@ -94,7 +90,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
     if (this::presenter.isInitialized) {
       return
     }
-    presenter = MainPresenter(this, TheSportDBApiService.create(),
+    presenter = MatchesPresenter(this, TheSportDBApiService.create(),
         Schedulers.io(), AndroidSchedulers.mainThread())
   }
 
@@ -172,7 +168,7 @@ class MatchesFragment : Fragment(), AnkoComponent<Context>, MainView {
   }
 
   override fun showEventList(data: List<Event>) {
-    Log.d("tes123", "Terpanggil")
+    //Log.d("tes123", "Terpanggil")
     hideLoading()
     textViewErrorMessage.invisible()
     listTeam.visible()

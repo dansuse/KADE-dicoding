@@ -3,7 +3,7 @@ package com.dansuse.playwithkotlin.presenter
 import android.accounts.NetworkErrorException
 import com.dansuse.playwithkotlin.model.*
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
-import com.dansuse.playwithkotlin.view.MainView
+import com.dansuse.playwithkotlin.view.matches.MatchesView
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.TestScheduler
@@ -15,19 +15,19 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
-class MainPresenterShould {
+class MatchesPresenterShould {
 
     private val leagueId = "4328"
 
     @Mock
     private
-    lateinit var view: MainView
+    lateinit var view: MatchesView
 
     @Mock
     private
     lateinit var theSportDBApiService: TheSportDBApiService
 
-    lateinit var mainPresenter: MainPresenter
+    lateinit var matchesPresenter: MatchesPresenter
     lateinit var testScheduler: TestScheduler
 
     @Before
@@ -35,7 +35,7 @@ class MainPresenterShould {
         MockitoAnnotations.initMocks(this)
 
         testScheduler = TestScheduler()
-        mainPresenter = MainPresenter(view, theSportDBApiService, testScheduler, testScheduler)
+        matchesPresenter = MatchesPresenter(view, theSportDBApiService, testScheduler, testScheduler)
     }
 
     @After
@@ -56,7 +56,7 @@ class MainPresenterShould {
             )
         ))
         `when`(theSportDBApiService.getAllLeagues()).thenReturn(Observable.just(leagueResponse))
-        mainPresenter.getLeagueList()
+        matchesPresenter.getLeagueList()
         testScheduler.triggerActions()
         verify(view).hideLoading()
         verify(view).showLeagueList(leagueResponse.leagues)
@@ -67,7 +67,7 @@ class MainPresenterShould {
         val exception = NetworkErrorException()
         `when`(theSportDBApiService.getAllLeagues()).thenReturn(
                 Observable.error(exception))
-        mainPresenter.getLeagueList()
+        matchesPresenter.getLeagueList()
         testScheduler.triggerActions()
         verify(view).showErrorMessage(exception.message ?: "Terjadi kesalahan saat mencoba mengambil data")
     }
@@ -79,14 +79,14 @@ class MainPresenterShould {
         val mode = if(isPrevMatchMode)TheSportDBApiService.MODE_PAST_15_EVENTS else
         TheSportDBApiService.MODE_NEXT_15_EVENTS
 
-        val eventResponse:EventResponse = EventResponse(ArrayList<Event>())
+        val eventResponse:EventResponse = EventResponse(ArrayList<Event>(), ArrayList<Event>())
         val teamResponse:TeamResponse = TeamResponse(ArrayList<Team>())
 
         `when`(theSportDBApiService.get15EventsByLeagueId(
                 mode, leagueId.toInt())).thenReturn(Observable.just(eventResponse))
         `when`(theSportDBApiService.getTeamDetail(ArgumentMatchers.anyInt()))
                 .thenReturn(Single.just(teamResponse))
-        mainPresenter.get15EventsByLeagueId(leagueId, isPrevMatchMode)
+        matchesPresenter.get15EventsByLeagueId(leagueId, isPrevMatchMode)
         testScheduler.triggerActions()
         verify(view).showLoading()
         verify(view, times(2)).hideLoading()
@@ -100,7 +100,7 @@ class MainPresenterShould {
         `when`(theSportDBApiService.get15EventsByLeagueId(
                 ArgumentMatchers.anyString(), ArgumentMatchers.anyInt()))
                 .thenReturn(Observable.error(Throwable(message = errorMessage)))
-        mainPresenter.get15EventsByLeagueId(leagueId, true)
+        matchesPresenter.get15EventsByLeagueId(leagueId, true)
         testScheduler.triggerActions()
         verify(view, times(2)).showErrorMessage(errorMessage)
     }

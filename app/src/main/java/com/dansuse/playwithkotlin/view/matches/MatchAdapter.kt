@@ -1,4 +1,4 @@
-package com.dansuse.playwithkotlin.view.adapter
+package com.dansuse.playwithkotlin.view.matches
 
 import android.content.Intent
 import android.graphics.Color

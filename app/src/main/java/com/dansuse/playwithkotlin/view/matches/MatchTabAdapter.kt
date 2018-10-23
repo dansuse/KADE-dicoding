@@ -1,10 +1,9 @@
-package com.dansuse.playwithkotlin.view.adapter
+package com.dansuse.playwithkotlin.view.matches
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import com.dansuse.playwithkotlin.view.matches.MatchesFragment
 
 class MatchTabAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 //    private val fragmentList:MutableList<Fragment> = mutableListOf()

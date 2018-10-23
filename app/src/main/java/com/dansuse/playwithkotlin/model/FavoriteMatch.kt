@@ -1,6 +1,7 @@
 package com.dansuse.playwithkotlin.model
 
 data class FavoriteMatch(val id: Long?, val eventId: String?, val eventDate: String?,
+                         val eventTime: String?,
                          val homeScore: String?, val awayScore: String?,
                          val homeName: String?, val awayName: String?,
                          val homeBadge: String?, val awayBadge: String?) {
@@ -10,6 +11,7 @@ data class FavoriteMatch(val id: Long?, val eventId: String?, val eventDate: Str
     const val ID: String = "ID_"
     const val EVENT_ID: String = "EVENT_ID"
     const val EVENT_DATE: String = "EVENT_DATE"
+    const val EVENT_TIME: String = "EVENT_TIME"
     const val HOME_SCORE: String = "HOME_SCORE"
     const val AWAY_SCORE: String = "AWAY_SCORE"
     const val HOME_NAME: String = "HOME_NAME"

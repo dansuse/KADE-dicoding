@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.dansuse.playwithkotlin.R
-import com.dansuse.playwithkotlin.view.adapter.MatchTabAdapter
 
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.tabLayout

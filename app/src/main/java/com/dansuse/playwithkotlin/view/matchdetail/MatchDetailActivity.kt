@@ -1,4 +1,4 @@
-package com.dansuse.playwithkotlin.view.activity
+package com.dansuse.playwithkotlin.view.matchdetail
 
 import android.database.sqlite.SQLiteConstraintException
 import android.graphics.Color
@@ -18,9 +18,8 @@ import com.dansuse.playwithkotlin.database.database
 import com.dansuse.playwithkotlin.invisible
 import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.FavoriteMatch
-import com.dansuse.playwithkotlin.presenter.DetailPresenter
+import com.dansuse.playwithkotlin.presenter.MatchDetailPresenter
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
-import com.dansuse.playwithkotlin.view.DetailView
 import com.dansuse.playwithkotlin.visible
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -34,13 +33,13 @@ import org.jetbrains.anko.design.snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DetailActivity : AppCompatActivity(), DetailView {
+class MatchDetailActivity : AppCompatActivity(), MatchDetailView {
 
   companion object {
-    var presenter: DetailPresenter? = null
+    var presenter: MatchDetailPresenter? = null
   }
 
-  private lateinit var presenter: DetailPresenter
+  private lateinit var presenter: MatchDetailPresenter
 
   private lateinit var scrollView: ScrollView
   private lateinit var detailActivityProgressBar: ProgressBar
@@ -174,7 +173,7 @@ class DetailActivity : AppCompatActivity(), DetailView {
     if (this::presenter.isInitialized) {
       return
     }
-    presenter = DetailPresenter(this, TheSportDBApiService.create(), Schedulers.io(), AndroidSchedulers.mainThread())
+    presenter = MatchDetailPresenter(this, TheSportDBApiService.create(), Schedulers.io(), AndroidSchedulers.mainThread())
   }
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -228,6 +227,7 @@ class DetailActivity : AppCompatActivity(), DetailView {
           insert(FavoriteMatch.TABLE_FAVORITE,
               FavoriteMatch.EVENT_ID to event?.id,
               FavoriteMatch.EVENT_DATE to event?.date,
+              FavoriteMatch.EVENT_TIME to event?.time,
               FavoriteMatch.HOME_SCORE to event?.homeScore,
               FavoriteMatch.AWAY_SCORE to event?.awayScore,
               FavoriteMatch.HOME_NAME to event?.homeTeamName,
@@ -343,8 +343,8 @@ class DetailActivity : AppCompatActivity(), DetailView {
 
 }
 
-class DetailActivityUI : AnkoComponent<DetailActivity> {
-  override fun createView(ui: AnkoContext<DetailActivity>): View {
+class DetailActivityUI : AnkoComponent<MatchDetailActivity> {
+  override fun createView(ui: AnkoContext<MatchDetailActivity>): View {
     return with(ui) {
       frameLayout {
         lparams(width = matchParent, height = matchParent)

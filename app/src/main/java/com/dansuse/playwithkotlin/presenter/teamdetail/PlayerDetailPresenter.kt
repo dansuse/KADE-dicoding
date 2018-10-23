@@ -1,35 +1,34 @@
 package com.dansuse.playwithkotlin.presenter.teamdetail
 
-import android.util.Log
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
-import com.dansuse.playwithkotlin.view.teamdetail.players.PlayersView
+import com.dansuse.playwithkotlin.view.teamdetail.players.playerdetail.PlayerDetailView
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 
-class PlayersPresenter(
-    private val playersView: PlayersView,
+class PlayerDetailPresenter(
+    private val view: PlayerDetailView,
     private val theSportDBApiService: TheSportDBApiService,
     private val processScheduler: Scheduler,
     private val androidScheduler: Scheduler
 ){
   private var playersDisposable: Disposable? = null
 
-  fun getPlayersByTeamId(teamId:String){
-    Log.d("tes123", "getPlayersByTeamId() $teamId")
-    playersView.showLoading()
+  fun getPlayerDetailByPlayerId(playerId:String){
+    view.showLoading()
     playersDisposable = theSportDBApiService
-        .getPlayersByTeamId(teamId)
+        .getPlayerDetail(playerId)
         .subscribeOn(processScheduler)
         .observeOn(androidScheduler)
         .subscribe(
             {
-              playersView.hideLoading()
-              playersView.showPlayerList(it.player)
+              view.hideLoading()
+              if(it.players.isNotEmpty()){
+                view.showPlayerDetail(it.players[0])
+              }
             },
             {
-              Log.d("tes123", "getPlayersByTeamId() ${it.message}")
-              playersView.hideLoading()
-              playersView.showErrorMessage(it.message ?: "Terjadi error saat meminta data pemain dari api")
+              view.hideLoading()
+              view.showErrorMessage(it.message ?: "Terjadi error saat meminta data detail player dari api")
             }
         )
   }

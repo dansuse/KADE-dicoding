@@ -1,26 +1,25 @@
-package com.dansuse.playwithkotlin.view.adapter
+package com.dansuse.playwithkotlin.view.teamdetail
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import com.dansuse.playwithkotlin.presenter.teamdetail.TeamDetailPresenter
-import com.dansuse.playwithkotlin.view.matches.MatchesFragment
-import com.dansuse.playwithkotlin.view.teamdetail.PlayersFragment
-import com.dansuse.playwithkotlin.view.teamdetail.TeamOverviewFragment
+import android.util.Log
+import com.dansuse.playwithkotlin.view.teamdetail.players.PlayersFragment
+import com.dansuse.playwithkotlin.view.teamdetail.overview.TeamOverviewFragment
 
-class TeamDetailTabAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class TeamDetailTabAdapter(fm: FragmentManager, private val teamId:String) : FragmentPagerAdapter(fm) {
 //    private val fragmentList:MutableList<Fragment> = mutableListOf()
 //    private val fragmentTitleList:MutableList<String> = mutableListOf()
 
-  var teamId:String? = null
 
   override fun getItem(index: Int): Fragment {
+    Log.d("tes123", "terpanggil $index")
     if(index == 0){
       val fragment = TeamOverviewFragment()
-//      fragment.arguments = Bundle().apply {
-//        putString(TeamOverviewFragment.EXTRA_TEAM_DESCRIPTION, "asd")
-//      }
+      fragment.arguments = Bundle().apply {
+        putString(TeamOverviewFragment.EXTRA_TEAM_ID, teamId)
+      }
       return fragment
     }else{
       val fragment = PlayersFragment().apply {

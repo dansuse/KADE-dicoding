@@ -17,7 +17,7 @@ class SearchMatchPresenter(
 ){
   private var searchResultDisposable: Disposable? = null
 
-  fun getSeachResult(query:String){
+  fun getSearchResult(query:String){
     view.showLoading()
     searchResultDisposable = theSportDBApiService
         .searchEvent(query)

@@ -1,4 +1,4 @@
-package com.dansuse.playwithkotlin.view.teamdetail
+package com.dansuse.playwithkotlin.view.teamdetail.overview
 
 interface TeamOverviewView{
   fun showLoading()

@@ -9,8 +9,8 @@ import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.dansuse.playwithkotlin.model.Event
-import com.dansuse.playwithkotlin.presenter.DetailPresenter
-import com.dansuse.playwithkotlin.view.activity.DetailActivity
+import com.dansuse.playwithkotlin.presenter.MatchDetailPresenter
+import com.dansuse.playwithkotlin.view.matchdetail.MatchDetailActivity
 import org.hamcrest.Matchers
 import org.junit.Rule
 import org.junit.Test
@@ -21,7 +21,7 @@ import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class DetailActivityShould{
-    private val detailPresenter = Mockito.mock(DetailPresenter::class.java)
+    private val detailPresenter = Mockito.mock(MatchDetailPresenter::class.java)
 
     private val eventId = "576548"
     private val event:Event = Event(
@@ -55,16 +55,16 @@ class DetailActivityShould{
 
     @Rule
     @JvmField var detailActivityRule =
-        object : ActivityTestRule<DetailActivity>(DetailActivity::class.java){
+        object : ActivityTestRule<MatchDetailActivity>(MatchDetailActivity::class.java){
             override fun getActivityIntent(): Intent {
                 val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
-                return Intent(targetContext, DetailActivity::class.java).apply {
+                return Intent(targetContext, MatchDetailActivity::class.java).apply {
                     putExtra("event", eventId)
                 }
             }
 
             override fun beforeActivityLaunched() {
-                DetailActivity.presenter = detailPresenter
+                MatchDetailActivity.presenter = detailPresenter
             }
         }
 

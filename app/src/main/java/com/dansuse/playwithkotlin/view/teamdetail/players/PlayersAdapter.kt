@@ -1,4 +1,4 @@
-package com.dansuse.playwithkotlin.view.teamdetail
+package com.dansuse.playwithkotlin.view.teamdetail.players
 
 import android.support.v7.widget.RecyclerView
 import android.view.Gravity
@@ -9,7 +9,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.dansuse.playwithkotlin.R
 import com.dansuse.playwithkotlin.model.Player
-import com.dansuse.playwithkotlin.model.Team
 import com.squareup.picasso.Picasso
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick

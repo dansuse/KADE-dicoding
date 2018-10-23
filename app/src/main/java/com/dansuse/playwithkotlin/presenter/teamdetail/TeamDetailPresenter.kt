@@ -1,16 +1,16 @@
 package com.dansuse.playwithkotlin.presenter.teamdetail
 
 import com.dansuse.playwithkotlin.repository.TheSportDBApiService
-import com.dansuse.playwithkotlin.view.teamdetail.PlayersView
+import com.dansuse.playwithkotlin.view.teamdetail.players.PlayersView
 import com.dansuse.playwithkotlin.view.teamdetail.TeamDetailView
-import com.dansuse.playwithkotlin.view.teamdetail.TeamOverviewView
+import com.dansuse.playwithkotlin.view.teamdetail.overview.TeamOverviewView
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 
 class TeamDetailPresenter(
     private val view: TeamDetailView,
-    private val teamOverviewView:TeamOverviewView,
-    private val playersView:PlayersView,
+    private val teamOverviewView: TeamOverviewView,
+    private val playersView: PlayersView,
     private val theSportDBApiService: TheSportDBApiService,
     private val processScheduler: Scheduler,
     private val androidScheduler: Scheduler) {

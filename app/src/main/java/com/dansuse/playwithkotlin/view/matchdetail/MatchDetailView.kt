@@ -1,8 +1,8 @@
-package com.dansuse.playwithkotlin.view
+package com.dansuse.playwithkotlin.view.matchdetail
 
 import com.dansuse.playwithkotlin.model.Event
 
-interface DetailView {
+interface MatchDetailView {
   fun showLoading()
   fun hideLoading()
   fun showEventDetail(event: Event)
