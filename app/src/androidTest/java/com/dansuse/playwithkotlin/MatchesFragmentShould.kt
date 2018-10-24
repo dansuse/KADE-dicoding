@@ -40,7 +40,7 @@ import org.mockito.Mockito.*
 
 
 @RunWith(AndroidJUnit4::class)
-class MainActivityShould {
+class MatchesFragmentShould {
 
     private val mainPresenter = Mockito.mock(MatchesPresenter::class.java)
     private val detailPresenter = Mockito.mock(MatchDetailPresenter::class.java)

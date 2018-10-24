@@ -29,7 +29,9 @@ class TeamViewHolder(view: View) : RecyclerView.ViewHolder(view) {
   private val teamName: TextView = view.find(R.id.team_name)
 
   fun bindItem(team: Team, listener: (Team) -> Unit) {
-    Picasso.get().load(team.teamBadge).into(teamBadge)
+    if(team.teamBadge != null && team.teamBadge != ""){
+      Picasso.get().load(team.teamBadge).into(teamBadge)
+    }
     teamName.text = team.teamName
     itemView.onClick { listener(team) }
   }

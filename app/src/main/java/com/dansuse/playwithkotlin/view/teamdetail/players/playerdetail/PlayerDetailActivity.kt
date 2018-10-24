@@ -44,7 +44,9 @@ class PlayerDetailActivity : AppCompatActivity(), PlayerDetailView {
 
           orientation = LinearLayout.VERTICAL
 
-          playerThumbnail = imageView()
+          playerThumbnail = imageView(){
+            scaleType = ImageView.ScaleType.CENTER_CROP
+          }
           linearLayout {
             orientation = LinearLayout.HORIZONTAL
 
@@ -53,7 +55,7 @@ class PlayerDetailActivity : AppCompatActivity(), PlayerDetailView {
               textView("Weight (Kg)").lparams{
                 gravity = Gravity.CENTER_HORIZONTAL
               }
-              playerWeight = textView("65.76"){
+              playerWeight = textView("-"){
                 textSize = 30.0f
                 gravity = Gravity.CENTER
               }.lparams{
@@ -67,7 +69,7 @@ class PlayerDetailActivity : AppCompatActivity(), PlayerDetailView {
               textView("Height (m)").lparams{
                 gravity = Gravity.CENTER_HORIZONTAL
               }
-              playerHeight = textView("1.68"){
+              playerHeight = textView("-"){
                 textSize = 30.0f
                 gravity = Gravity.CENTER
               }.lparams{
@@ -122,11 +124,18 @@ class PlayerDetailActivity : AppCompatActivity(), PlayerDetailView {
     parentView.visible()
     player = data
     supportActionBar?.title = data.playerName
-    playerHeight.text = player.height ?: "-"
-    playerWeight.text = player.weight ?: "-"
-    playerPosition.text = player.position ?: "-"
+    playerHeight.text = processString(player.height)
+    playerWeight.text = processString(player.weight)
+    playerPosition.text = processString(player.position)
     playerDescription.text = player.description ?: "No Description Available"
     Picasso.get().load(player.urlThumbnail).into(playerThumbnail)
+  }
+
+  private fun processString(input:String?):String{
+    if(input == null || input == ""){
+      return "-"
+    }
+    return input
   }
 
   override fun showErrorMessage(errorMessage: String) {

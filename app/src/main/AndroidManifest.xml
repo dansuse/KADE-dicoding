@@ -29,11 +29,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".view.activity.MainActivity" />
         </activity>
-        <activity android:name=".view.searchmatch.SearchableActivity">
+        <activity android:name=".view.searchmatch.SearchableActivity"
+            android:label="@string/search_match_activity_label"
+            android:parentActivityName=".view.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".view.activity.MainActivity" />
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />

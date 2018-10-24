@@ -20,7 +20,7 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
-class DetailActivityShould{
+class MatchDetailActivityShould{
     private val detailPresenter = Mockito.mock(MatchDetailPresenter::class.java)
 
     private val eventId = "576548"

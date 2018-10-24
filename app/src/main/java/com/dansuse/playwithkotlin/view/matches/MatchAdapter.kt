@@ -89,7 +89,7 @@ class MatchViewHolder(view: View) : RecyclerView.ViewHolder(view) {
       }
     }
 
-    if (event.homeBadge != null) {
+    if (event.homeBadge != null && event.homeBadge != "") {
       progressBarHomeBadge.invisible()
       teamBadgeHome.visible()
       Picasso.get().load(event.homeBadge).into(teamBadgeHome)
@@ -98,7 +98,7 @@ class MatchViewHolder(view: View) : RecyclerView.ViewHolder(view) {
       teamBadgeHome.invisible()
     }
 
-    if (event.awayBadge != null) {
+    if (event.awayBadge != null && event.awayBadge != "") {
       progressBarAwayBadge.invisible()
       teamBadgeAway.visible()
       Picasso.get().load(event.awayBadge).into(teamBadgeAway)

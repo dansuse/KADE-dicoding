@@ -271,7 +271,7 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
       R.id.add_to_favorite -> {
         if (isFavorite) removeFromFavorite() else addToFavorite()
 
-        isFavorite = !isFavorite
+
         setFavorite()
         true
       }
@@ -281,6 +281,7 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
   }
 
   private fun favoriteState() {
+    EspressoIdlingResource.mCountingIdlingResource.increment()
     database.use {
       val result = select(FavoriteTeam.TABLE_FAVORITE)
           .whereArgs("(TEAM_ID = {id})",
@@ -288,6 +289,7 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
       val favorite = result.parseList(classParser<FavoriteTeam>())
       if (!favorite.isEmpty()) isFavorite = true
     }
+    EspressoIdlingResource.mCountingIdlingResource.decrement()
   }
 
   private fun setFavorite() {
@@ -307,6 +309,7 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
               FavoriteTeam.TEAM_NAME to teams?.teamName,
               FavoriteTeam.TEAM_BADGE to teams?.teamBadge)
         }
+        isFavorite = true
         coordinatorLayout.snackbar("Added to favorite").show()
       } catch (e: SQLiteConstraintException) {
         coordinatorLayout.snackbar(e.message ?: "Terjadi error saat menambahkan team ke daftar favorit").show()
@@ -323,6 +326,7 @@ class TeamDetailActivity : AppCompatActivity(), TeamDetailView {
       database.use {
         delete(FavoriteTeam.TABLE_FAVORITE, "(TEAM_ID = {id})", "id" to id)
       }
+      isFavorite = false
       coordinatorLayout.snackbar("Removed to favorite").show()
     } catch (e: SQLiteConstraintException) {
       coordinatorLayout.snackbar(e.message ?: "Terjadi error saat remove team dari daftar favorit").show()

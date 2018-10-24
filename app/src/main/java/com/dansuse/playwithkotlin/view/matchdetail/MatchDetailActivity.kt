@@ -45,6 +45,7 @@ class MatchDetailActivity : AppCompatActivity(), MatchDetailView {
   private lateinit var detailActivityProgressBar: ProgressBar
 
   private lateinit var matchDate: TextView
+  private lateinit var matchTime: TextView
   private lateinit var matchScore: TextView
   private lateinit var homeTeamName: TextView
   private lateinit var awayTeamName: TextView
@@ -141,6 +142,7 @@ class MatchDetailActivity : AppCompatActivity(), MatchDetailView {
     DetailActivityUI().setContentView(this)
 
     matchDate = find(R.id.match_date)
+    matchTime = find(R.id.match_time)
     matchScore = find(R.id.match_score)
     homeTeamName = find(R.id.team_name_home)
     awayTeamName = find(R.id.team_name_away)
@@ -325,20 +327,35 @@ class MatchDetailActivity : AppCompatActivity(), MatchDetailView {
     homeSubstitutes.text = event.homeLineupSubstitutes?.replace(";", "\n")
     awaySubstitutes.text = event.awayLineupSubstitutes?.replace(";", "\n")
 
-    if (event.homeBadge != null) {
+    if (event.homeBadge != null && event.homeBadge != "") {
       homeBadgeProgressBar.invisible()
       homeBadge.visible()
       Picasso.get().load(event.homeBadge).into(homeBadge)
     }
-    if (event.awayBadge != null) {
+    if (event.awayBadge != null && event.awayBadge != "") {
       awayBadgeProgressBar.invisible()
       awayBadge.visible()
       Picasso.get().load(event.awayBadge).into(awayBadge)
     }
     val inputFormat = SimpleDateFormat("dd/MM/yy", Locale.US)
-    val date: Date = inputFormat.parse(event.date)
+    val date: Date? = try{
+      inputFormat.parse(event.date)
+    }catch (e:Exception){
+      null
+    }
     val outputFormat = SimpleDateFormat("E, dd MMM yyyy")
-    matchDate.text = outputFormat.format(date)
+    outputFormat.timeZone = TimeZone.getTimeZone("Asia/Pontianak")
+    matchDate.text = if(date == null) "-" else outputFormat.format(date)
+
+    val inputTimeFormat = SimpleDateFormat("HH:mm:ssXXX")
+    val inputTime :Date? = try{
+      inputTimeFormat.parse(event.time)
+    }catch (e:Exception){
+      null
+    }
+    val outputTimeFormat = SimpleDateFormat("HH:mm")
+    outputTimeFormat.timeZone = TimeZone.getTimeZone("Asia/Pontianak")
+    matchTime.text = if(inputTime == null) "-" else outputTimeFormat.format(inputTime)
   }
 
 }
@@ -358,6 +375,14 @@ class DetailActivityUI : AnkoComponent<MatchDetailActivity> {
             lparams(width = matchParent, height = wrapContent)
             textView {
               id = R.id.match_date
+              textSize = 16f
+              setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
+            }.lparams {
+              gravity = Gravity.CENTER_HORIZONTAL
+              topMargin = dip(16)
+            }
+            textView {
+              id = R.id.match_time
               textSize = 16f
               setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
             }.lparams {
