@@ -52,4 +52,12 @@ class MatchContainerFragment : Fragment(), AnkoComponent<Context> {
       }.lparams(width = matchParent, height = matchParent)
     }
   }
+
+  fun getFragment(index:Int):Fragment{
+    return matchTabAdapter.getItem(index)
+  }
+
+  fun getViewPager():ViewPager{
+    return viewPager
+  }
 }

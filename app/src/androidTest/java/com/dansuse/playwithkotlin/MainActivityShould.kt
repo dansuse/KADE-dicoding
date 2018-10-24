@@ -13,17 +13,22 @@ import android.support.test.espresso.intent.Intents
 import android.support.test.espresso.intent.Intents.intended
 import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra
+import android.support.test.espresso.matcher.ViewMatchers
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import android.support.v4.view.ViewPager
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import com.dansuse.playwithkotlin.model.Event
 import com.dansuse.playwithkotlin.model.League
 import com.dansuse.playwithkotlin.presenter.MatchDetailPresenter
 import com.dansuse.playwithkotlin.presenter.MatchesPresenter
 import com.dansuse.playwithkotlin.view.matchdetail.MatchDetailActivity
 import com.dansuse.playwithkotlin.view.activity.MainActivity
+import com.dansuse.playwithkotlin.view.matches.MatchContainerFragment
 import com.dansuse.playwithkotlin.view.matches.MatchesFragment
+import org.hamcrest.Matcher
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -43,6 +48,8 @@ class MainActivityShould {
     private val events = listOf(
             Event(
                     id = "576548",
+                    title = "Fulham vs Arsenal",
+                    time = "11:00:00+00:00",
                     date = "07/10/18",
                     homeScore = "1",
                     awayScore = "5",
@@ -71,6 +78,8 @@ class MainActivityShould {
             ),
             Event(
                     id = "576543",
+                    title = "Southampton vs Chelsea",
+                    time = "13:15:00+00:00",
                     date = "07/10/18",
                     homeScore = "0",
                     awayScore = "3",
@@ -131,56 +140,92 @@ class MainActivityShould {
 
     @Test
     fun subscribe_to_main_presenter_and_load_leagues(){
-        verify(mainPresenter, times(1)).getLeagueList()
+        verify(mainPresenter, times(2)).getLeagueList()
     }
 
     @Test
     fun load_last_15_matches_when_dropdown_value_changes(){
-        `when`(mainPresenter.get15EventsByLeagueId(
-                ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean()))
-                .then {
-                    mainActivityRule.activity.runOnUiThread {
-                        val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-                        matchesFragment.showEventList(events)
-                    }
-                }
+//        `when`(mainPresenter.get15EventsByLeagueId(
+//                ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean()))
+//                .then {
+//                    mainActivityRule.activity.runOnUiThread {
+//                        val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+//                        matchesFragment.showEventList(events)
+//                    }
+//                }
 
         mainActivityRule.activity.runOnUiThread {
-            val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+            val matchContainerFragment : MatchContainerFragment =
+                (mainActivityRule.activity
+                    .supportFragmentManager
+                    .findFragmentById(R.id.main_container) as MatchContainerFragment)
+            val viewPager:ViewPager = matchContainerFragment.getViewPager()
+            val matchesFragment:MatchesFragment =
+                matchContainerFragment
+                    .childFragmentManager.findFragmentByTag(
+                    "android:switcher:" + R.id.view_pager_matches + ":" + viewPager.currentItem
+                ) as MatchesFragment
             matchesFragment.showLeagueList(leagues)
         }
 
+        val spinnerMatcher:Matcher<View> = allOf(
+            //withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+            isCompletelyDisplayed(),
+            withId(R.id.spinner_league))
+        val recyclerViewMatcher:Matcher<View> = allOf(
+            //withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+            isCompletelyDisplayed(),
+            withId(R.id.list_event)
+        )
+
         val selectionText = leagues[1].leagueName
-        onView(withId(R.id.spinner_league)).check(matches(isDisplayed()))
-        verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[0].id, true)
-        onView(withId(R.id.list_event)).check(matches(isDisplayed()))
-        onView(withId(R.id.spinner_league)).perform(click())
+        onView(spinnerMatcher).check(matches(isDisplayed()))
+        verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[0].id, false)
+        onView(recyclerViewMatcher).check(matches(isDisplayed()))
+        onView(spinnerMatcher).perform(click())
 
         onData(`is`(instanceOf(League::class.java)))
                 .atPosition(1)
                 .perform(click())
 
-        onView(withId(R.id.spinner_league)).check(matches(withSpinnerText(containsString(selectionText))))
+        onView(spinnerMatcher).check(matches(withSpinnerText(containsString(selectionText))))
 
-        verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[1].id, true)
+        verify(mainPresenter, times(1)).get15EventsByLeagueId(leagues[1].id, false)
     }
 
     @Test
     fun open_event_detail_when_click_event_list_item() {
         Intents.init()
         mainActivityRule.activity.runOnUiThread {
-            val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+            //val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+            val matchContainerFragment : MatchContainerFragment =
+                (mainActivityRule.activity
+                    .supportFragmentManager
+                    .findFragmentById(R.id.main_container) as MatchContainerFragment)
+            val viewPager:ViewPager = matchContainerFragment.getViewPager()
+            val matchesFragment:MatchesFragment =
+                matchContainerFragment
+                    .childFragmentManager.findFragmentByTag(
+                    "android:switcher:" + R.id.view_pager_matches + ":" + viewPager.currentItem
+                ) as MatchesFragment
             matchesFragment.showEventList(events)
         }
-        onView(withId(R.id.list_event))
+
+        val recyclerViewMatcher:Matcher<View> = allOf(
+            //withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+            isCompletelyDisplayed(),
+            withId(R.id.list_event)
+        )
+
+        onView(recyclerViewMatcher)
                 .check(matches(isDisplayed()))
 
         events.forEach {
             onView(withText(it.homeTeamName)).check(matches(isDisplayed()))
             onView(withText(it.awayTeamName)).check(matches(isDisplayed()))
         }
-        onView(withId(R.id.list_event)).perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(1))
-        onView(withId(R.id.list_event)).perform(
+        onView(recyclerViewMatcher).perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(1))
+        onView(recyclerViewMatcher).perform(
                 RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(1, click()))
 
         intended(allOf(hasComponent(MatchDetailActivity::class.java.name), hasExtra("event", events[1].id)))
@@ -189,14 +234,32 @@ class MainActivityShould {
     }
 
     @Test
-    fun load_next_15_matches_when_click_next_match_bottom_navigation(){
-        onView(withId(R.id.action_next_match)).perform(click())
+    fun load_past_15_matches_when_click_tab_with_label_past(){
+        val matcher:Matcher<View> = allOf(withText("PAST"),
+            isDescendantOfA(withId(R.id.tab_layout_matches)))
+        //onView(withId(R.id.action_next_match)).perform(click())
+        onView(matcher).perform(click())
         mainActivityRule.activity.runOnUiThread {
-            val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
-            matchesFragment.showLeagueList(leagues)
+            //val matchesFragment:MatchesFragment = mainActivityRule.activity.supportFragmentManager.findFragmentById(R.id.main_container) as MatchesFragment
+          val matchContainerFragment : MatchContainerFragment =
+              (mainActivityRule.activity
+                  .supportFragmentManager
+                  .findFragmentById(R.id.main_container) as MatchContainerFragment)
+          val viewPager:ViewPager = matchContainerFragment.getViewPager()
+          val matchesFragment:MatchesFragment =
+              matchContainerFragment
+                  .childFragmentManager.findFragmentByTag(
+                  "android:switcher:" + R.id.view_pager_matches + ":" + viewPager.currentItem
+              ) as MatchesFragment
+          matchesFragment.showLeagueList(leagues)
         }
-        onView(withId(R.id.spinner_league)).check(matches(isDisplayed()))
-        verify(mainPresenter).get15EventsByLeagueId(ArgumentMatchers.anyString(), ArgumentMatchers.eq(false))
+      val spinnerMatcher:Matcher<View> = allOf(
+          //withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+          isCompletelyDisplayed(),
+          withId(R.id.spinner_league))
+
+        onView(spinnerMatcher).check(matches(isDisplayed()))
+        verify(mainPresenter).get15EventsByLeagueId(ArgumentMatchers.anyString(), ArgumentMatchers.eq(true))
     }
 
     @Test
@@ -221,7 +284,12 @@ class MainActivityShould {
                 .check(matches(isDisplayed()))
         pressBack()
         onView(withId(R.id.action_favorites)).perform(click())
-        onView((withId(R.id.list_favorite_event))).check(matches(isDisplayed()))
+        val recyclerViewMatcher:Matcher<View> = allOf(
+            //withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+            isCompletelyDisplayed(),
+            withId(R.id.list_favorite_event)
+        )
+        onView(withId(R.id.list_favorite_event)).check(matches(isDisplayed()))
         onView(withText(events[1].homeTeamName)).check(matches(isDisplayed()))
         onView(withText(events[1].awayTeamName)).check(matches(isDisplayed()))
 

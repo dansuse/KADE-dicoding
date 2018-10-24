@@ -26,7 +26,7 @@ class FavoriteTeamsFragment : Fragment(), AnkoComponent<Context> {
 
   private var favoriteTeams: MutableList<FavoriteTeam> = mutableListOf()
   private lateinit var adapter: FavoriteTeamsAdapter
-  private lateinit var listEvent: RecyclerView
+  private lateinit var listTeam: RecyclerView
   private lateinit var swipeRefresh: SwipeRefreshLayout
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -36,7 +36,7 @@ class FavoriteTeamsFragment : Fragment(), AnkoComponent<Context> {
       requireContext().startActivity<TeamDetailActivity>("id" to "${it.teamId}")
     }
 
-    listEvent.adapter = adapter
+    listTeam.adapter = adapter
     showFavorite()
     swipeRefresh.onRefresh {
       favoriteTeams.clear()
@@ -56,14 +56,14 @@ class FavoriteTeamsFragment : Fragment(), AnkoComponent<Context> {
       rightPadding = dip(16)
 
       swipeRefresh = swipeRefreshLayout {
-        id = R.id.swipe_refresh_favorite_event
+        id = R.id.swipe_refresh_favorite_team
         setColorSchemeResources(R.color.colorAccent,
             android.R.color.holo_green_light,
             android.R.color.holo_orange_light,
             android.R.color.holo_red_light)
 
-        listEvent = recyclerView {
-          id = R.id.list_favorite_event
+        listTeam = recyclerView {
+          id = R.id.list_favorite_team
           lparams(width = matchParent, height = matchParent)
           layoutManager = LinearLayoutManager(ctx)
         }

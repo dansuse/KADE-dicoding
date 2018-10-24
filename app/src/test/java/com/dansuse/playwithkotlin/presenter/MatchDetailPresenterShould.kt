@@ -15,7 +15,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
-class DetailPresenterShould{
+class MatchDetailPresenterShould{
 
     private val event:Event = Event(
             id = "576548",
