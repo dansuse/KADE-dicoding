@@ -9,7 +9,13 @@ This repository contains my Final Project, Quiz Submission, and Module tutorial 
 + **master** branch which contains Final Project and Quiz
 + **lanjut-modul-7** branch which contains Module tutorial code.
 
-## This is the list of library which i used for developing this application (Coming Soon)
-+
+## How I crafted this application
++ The layout is full built with Anko-Layout
++ Using Anko-Commons, especially intent-builder feature which makes composing intent really concise
++ Kotlin Android Extensions
++ Android KTX
++ Anko-SQLite
++ Unit Testing with JUnit
++ UI Testing with Espresso
 
 ## This is the preview of my Final Project (Coming Soon)
